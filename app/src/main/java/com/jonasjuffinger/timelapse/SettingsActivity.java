@@ -108,7 +108,7 @@ public class SettingsActivity extends BaseActivity
         sbTargetExposure = (AdvancedSeekBar) findViewById(R.id.sbTargetExposure);
         tvTargetExposureValue = (TextView) findViewById(R.id.tvTargetExposureValue);
         tvTargetExposureUnit = (TextView) findViewById(R.id.tvTargetExposureUnit);
-        sbTargetExposure.setMax(100);
+        sbTargetExposure.setMax(60);
         sbTargetExposure.setOnSeekBarChangeListener(sbTargetExposureOnSeekBarChangeListener);
         sbTargetExposure.setProgress(settings.targetExposure);
         sbTargetExposureOnSeekBarChangeListener.onProgressChanged(sbTargetExposure, settings.targetExposure, false);
@@ -214,9 +214,10 @@ public class SettingsActivity extends BaseActivity
     sbTargetExposureOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            //the seekbar is from 0 to 100, but we want -50 to 50
-            settings.targetExposure = i - 50;
-            tvTargetExposureValue.setText(Integer.toString(settings.targetExposure));
+            //the seekbar is from 0 to 60, but we want -30 to 30
+            settings.targetExposure = i - 30;
+            //Float.toString(settings.targetExposure/3.0f) show only 2 decimals
+            tvTargetExposureValue.setText(String.format("%.2f", settings.targetExposure/3.0f));
             tvTargetExposureUnit.setText("EV");
         }
 

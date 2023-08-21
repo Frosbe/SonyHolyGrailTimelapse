@@ -60,8 +60,8 @@ class Settings {
         brs = true;
         mf = true;
         holyGrail = true;
-        targetExposure = 50; //0
-        maxShutterSpeed = 30;
+        targetExposure = 0; //0
+        maxShutterSpeed = 0;
         holyGrailAllowExposureUp = true;
         holyGrailAllowExposureDown = false;
     }

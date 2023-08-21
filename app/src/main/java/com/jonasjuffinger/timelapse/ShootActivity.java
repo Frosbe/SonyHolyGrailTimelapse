@@ -7,6 +7,7 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.Pair;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -22,14 +23,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ShootActivity extends BaseActivity implements SurfaceHolder.Callback, CameraEx.ShutterListener
+public class ShootActivity extends BaseActivity implements SurfaceHolder.Callback, CameraEx.ShutterListener, CameraEx.ShutterSpeedChangeListener
 {
     private Settings settings;
 
     private int shotCount;
 
-    private TextView tvCount, tvBattery, tvRemaining, tvExposureLevel;
-    private LinearLayout llEnd;
+    private TextView tvCount, tvBattery, tvRemaining, tvExposureLevel, tvLastPictureExposureLevel, tvTargetExposureLevel, tvLastPictureShutterspeed, tvShotsSinceLastChange;
 
     private SurfaceView reviewSurfaceView;
     private SurfaceHolder cameraSurfaceHolder;
@@ -45,11 +45,15 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
     private long shootTime;
     private long shootStartTime;
 
-    private float exposureLevel;
+    private float exposureLevel = 0;
+    private float lastPictureExposureLevel = 0;
+    private String shutterSpeed = "";
+    private String lastPictureShutterSpeed = "";
+    private double shutterSpeedValue = 0;
+    private int lastHolyGrailSettingUpdateShotCount = -5;
 
     private Display display;
 
-    static private final boolean SHOW_END_SCREEN = true;
 
     int getcnt(){
         if(settings.brs){
@@ -96,11 +100,10 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(SHOW_END_SCREEN) {
+                        if(false) {
                             tvCount.setText("Thanks for using this app!");
                             tvBattery.setVisibility(View.INVISIBLE);
                             tvRemaining.setVisibility(View.INVISIBLE);
-                            llEnd.setVisibility(View.VISIBLE);
                         }
                         else {
                             onBackPressed();
@@ -136,8 +139,11 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
         tvCount = (TextView) findViewById(R.id.tvCount);
         tvBattery = (TextView) findViewById(R.id.tvBattery);
         tvRemaining = (TextView) findViewById(R.id.tvRemaining);
+        tvLastPictureExposureLevel = (TextView) findViewById(R.id.tvLastPictureExposure);
+        tvTargetExposureLevel = (TextView) findViewById(R.id.tvTargetExposureLevel);
+        tvLastPictureShutterspeed = (TextView) findViewById(R.id.tvLastPictureShutterspeed);
         tvExposureLevel = (TextView) findViewById(R.id.tvExposureLevel);
-        llEnd = (LinearLayout) findViewById(R.id.llEnd);
+        tvShotsSinceLastChange = (TextView) findViewById(R.id.tvShotsSinceLastChange);
 
         reviewSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
         reviewSurfaceView.setZOrderOnTop(false);
@@ -250,6 +256,7 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
             public void onEVRange(int ev, CameraEx cameraEx)
             {
                 exposureLevel = (float)ev / 3.0f;
+                tvExposureLevel.setText(String.format("%.1f", exposureLevel));
                 //log(String.format("onEVRange i %d %f\n", ev, (float)ev / 3.0f));
             }
 
@@ -260,10 +267,32 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
             }
         });
 
+        updateShutterSpeed();
+
+        lastPictureExposureLevel = exposureLevel;
+        lastPictureShutterSpeed = shutterSpeed;
+        updateScreen();
+    }
+
+    private void updateShutterSpeed(){
+        final Camera.Parameters params = cameraEx.getNormalCamera().getParameters();
+        final CameraEx.ParametersModifier paramsModifier = cameraEx.createParametersModifier(params);
+        Pair<Integer, Integer> sp = paramsModifier.getShutterSpeed();
+        shutterSpeed = String.format("%d/%d", sp.first, sp.second);
+        shutterSpeedValue = (float)sp.first / (float)sp.second;
+    }
+
+    private void updateScreen(){
         tvCount.setText(Integer.toString(shotCount)+"/"+Integer.toString(settings.shotCount * getcnt()));
         tvRemaining.setText(getRemainingTime());
-        tvExposureLevel.setText(String.format("%.1f", exposureLevel));
         tvBattery.setText(getBatteryPercentage());
+
+        //Holy Grail
+        tvLastPictureExposureLevel.setText(String.format("%.1f", lastPictureExposureLevel));
+        tvLastPictureShutterspeed.setText(lastPictureShutterSpeed);
+        tvTargetExposureLevel.setText(String.format("%.2f", (settings.targetExposure) / 3.0f));
+        tvShotsSinceLastChange.setText(Integer.toString(shotCount - lastHolyGrailSettingUpdateShotCount));
+
     }
 
     @Override
@@ -319,28 +348,152 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
         catch (IOException e) {}
     }
 
+    @Override
+    public void onShutterSpeedChange(CameraEx.ShutterSpeedInfo shutterSpeedInfo, CameraEx cameraEx)
+    {
+        int numerator = shutterSpeedInfo.currentShutterSpeed_n;
+        int denominator = shutterSpeedInfo.currentShutterSpeed_d;
+        final String formattedShutterSpeed = String.format("%d/%d", numerator, denominator);
+        shutterSpeed = formattedShutterSpeed;
+        log("shutter speed changed to " + formattedShutterSpeed);
+        shutterSpeedValue = (float)numerator / (float)denominator;
+    }
+
     private void shoot() {
         if(takingPicture)
             return;
 
-        shootTime = System.currentTimeMillis();
+        if (settings.holyGrail){
+            holyGrailPrePhotoEvent();
+        }
 
+        shootTime = System.currentTimeMillis();
         cameraEx.burstableTakePicture();
 
         shotCount++;
 
+        lastPictureExposureLevel = exposureLevel;
+        lastPictureShutterSpeed = shutterSpeed;
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                tvCount.setText(Integer.toString(shotCount)+"/"+Integer.toString(settings.shotCount * getcnt()));
-                tvRemaining.setText(getRemainingTime());
-                tvExposureLevel.setText(String.format("%.1f", exposureLevel));
-                tvBattery.setText(getBatteryPercentage());
+                updateScreen();
             }
         });
     }
 
+    private void holyGrailPrePhotoEvent(){
 
+        float targetExposureLevel = (settings.targetExposure) / 3.0f;
+        log("targetExposureLevel: " + targetExposureLevel);
+        //if holy grail is enabled
+        if (settings.holyGrail){
+            log("holy grail enabled");
+            //if it has been more than 5 shots since the last holy grail setting change
+            if (shotCount - lastHolyGrailSettingUpdateShotCount >= 5){
+                log("more than 5 shots since last holy grail setting change");
+                //if we are allowed to exposure up
+                if (settings.holyGrailAllowExposureUp){
+                    log("holy grail allow exposure up");
+                    //do we need to exposure up?
+                    log("exposureLevel: " + exposureLevel);
+                    log("targetExposureLevel - 0.7f: " + (targetExposureLevel - 0.7f));
+                    if (exposureLevel < targetExposureLevel - 0.7f){
+                        log("exposureLevel < targetExposureLevel - 0.7f");
+                        //exposure up
+                        //can we increase shutter speed?
+
+                        log("shutterSpeedValue: " + shutterSpeedValue);
+                        log("settings.MaxShutterSpeed: " + settings.maxShutterSpeed);
+                        if (shutterSpeedValue < settings.maxShutterSpeed){
+                            log("shutterSpeedValue < settings.MaxShutterSpeed");
+                            //make the shutter open longer
+                            cameraEx.decrementShutterSpeed();
+                            lastHolyGrailSettingUpdateShotCount = shotCount;
+                        }
+                        else{
+
+                            //increase ISO
+                            incrementISO();
+                            lastHolyGrailSettingUpdateShotCount = shotCount;
+                        }
+                    }
+                }
+
+                //if we are allowed to exposure down
+                if (settings.holyGrailAllowExposureDown){
+                    log("holy grail allow exposure down");
+                    //do we need to exposure down?
+                    log("exposureLevel: " + exposureLevel);
+                    log("targetExposureLevel + 0.7f: " + (targetExposureLevel + 0.7f));
+                    if (exposureLevel > targetExposureLevel + 0.7f){
+                        log("exposureLevel > targetExposureLevel + 0.7f");
+                        //exposure down
+                        //can we decrease shutter speed?
+                        //get the minimum shutter speed value
+
+                        if (shutterSpeedValue > 1/8000){
+                            log("shutterSpeedValue > 1/8000");
+                            //make the shutter open shorter
+                            cameraEx.incrementShutterSpeed();
+                            lastHolyGrailSettingUpdateShotCount = shotCount;
+                        }
+                        else{
+                            //decrease ISO
+                            decrementISO();
+                            lastHolyGrailSettingUpdateShotCount = shotCount;
+                        }
+                    }
+                }
+            }
+        }
+        updateShutterSpeed();
+    }
+
+    private void incrementISO(){
+        log("incrementISO");
+        Camera.Parameters params = cameraEx.createEmptyParameters();
+
+        //get the list of supported ISO values list of ints
+        List<String> supportedISOs = cameraEx.createParametersModifier(params).getSupportedISOSensitivities();
+
+        //get the current ISO value
+        int currentISO = cameraEx.createParametersModifier(params).getISOSensitivity();
+
+        //find the index of the current ISO value
+        int currentISOIndex = supportedISOs.indexOf(Integer.toString(currentISO));
+
+        //if the current ISO value is not the last in the list
+        if (currentISOIndex < supportedISOs.size() - 1){
+            //set the ISO value to the next one in the list, parse it to an int
+            cameraEx.createParametersModifier(params).setISOSensitivity(Integer.parseInt(supportedISOs.get(currentISOIndex + 1)));
+            //set the camera parameters
+            cameraEx.getNormalCamera().setParameters(params);
+        }
+    }
+
+    private void decrementISO(){
+        log("decrementISO");
+        Camera.Parameters params = cameraEx.createEmptyParameters();
+
+        //get the list of supported ISO values list of ints
+        List<String> supportedISOs = cameraEx.createParametersModifier(params).getSupportedISOSensitivities();
+
+        //get the current ISO value
+        int currentISO = cameraEx.createParametersModifier(params).getISOSensitivity();
+
+        //find the index of the current ISO value
+        int currentISOIndex = supportedISOs.indexOf(Integer.toString(currentISO));
+
+        //if the current ISO value is not the first in the list
+        if (currentISOIndex > 0){
+            //set the ISO value to the previous one in the list, parse it to an int
+            cameraEx.createParametersModifier(params).setISOSensitivity(Integer.parseInt(supportedISOs.get(currentISOIndex - 1)));
+            //set the camera parameters
+            cameraEx.getNormalCamera().setParameters(params);
+        }
+    }
 
     private AtomicInteger brck = new AtomicInteger(0);
 
@@ -361,10 +514,7 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    tvCount.setText(getRemainingTime());
-                    tvRemaining.setText("");
-                    tvExposureLevel.setText(String.format("%.1f", exposureLevel));
-                    tvBattery.setText(getBatteryPercentage());
+                    updateScreen();
                 }
             });
 
@@ -377,12 +527,11 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(SHOW_END_SCREEN) {
+                        if(false) {
                             tvCount.setText("Thanks for using this app!");
                             tvBattery.setVisibility(View.INVISIBLE);
                             tvRemaining.setVisibility(View.INVISIBLE);
                             tvExposureLevel.setVisibility(View.INVISIBLE);
-                            llEnd.setVisibility(View.VISIBLE);
                         }
                         else {
                             onBackPressed();
