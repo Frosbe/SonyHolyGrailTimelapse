@@ -21,9 +21,16 @@ class Settings {
     private static final String EXTRA_AEL = "com.jonasjuffinger.timelapse.AEL";
     private static final String EXTRA_BRS = "com.jonasjuffinger.timelapse.BRS";
     private static final String EXTRA_MF = "com.jonasjuffinger.timelapse.MF";
+    private static final String EXTRA_HOLYGRAIL = "com.jonasjuffinger.timelapse.HOLYGRAIL";
+    private static final String EXTRA_TARGETEXPOSURE = "com.jonasjuffinger.timelapse.TARGETEXPOSURE";
+    private static final String EXTRA_MAXSHUTTERSPEED = "com.jonasjuffinger.timelapse.MAXSHUTTERSPEED";
+    private static final String EXTRA_HOLYGRAILALLOWEXPOSUREUP = "com.jonasjuffinger.timelapse.HOLYGRAILALLOWEXPOSUREUP";
+    private static final String EXTRA_HOLYGRAILALLOWEXPOSUREDOWN = "com.jonasjuffinger.timelapse.HOLYGRAILALLOWEXPOSUREDOWN";
+
 
     double interval;
     int delay;
+    int MaxShutterSpeed;
     int rawInterval, rawDelay;
     int shotCount, rawShotCount;
     boolean displayOff;
@@ -32,6 +39,12 @@ class Settings {
     int fps;    // index
     boolean brs;
     boolean mf;
+    boolean holyGrail;
+    int targetExposure;
+    int maxShutterSpeed;
+    boolean holyGrailAllowExposureUp;
+    boolean holyGrailAllowExposureDown;
+
 
     Settings() {
         interval = 1;
@@ -46,9 +59,14 @@ class Settings {
         fps = 0;
         brs = true;
         mf = true;
+        holyGrail = true;
+        targetExposure = 50; //0
+        maxShutterSpeed = 30;
+        holyGrailAllowExposureUp = true;
+        holyGrailAllowExposureDown = false;
     }
 
-    public Settings(double interval, int shotCount, int delay, boolean displayOff, boolean silentShutter, boolean ael, boolean brs, boolean mf) {
+    public Settings(double interval, int shotCount, int delay, boolean displayOff, boolean silentShutter, boolean ael, boolean brs, boolean mf, boolean holyGrail, int targetExposure, int maxShutterSpeed, boolean holyGrailAllowExposureUp, boolean holyGrailAllowExposureDown) {
         this.interval = interval;
         this.delay = delay;
         this.shotCount = shotCount;
@@ -57,6 +75,11 @@ class Settings {
         this.ael = ael;
         this.brs = brs;
         this.mf = mf;
+        this.holyGrail = holyGrail;
+        this.targetExposure = targetExposure;
+        this.maxShutterSpeed = maxShutterSpeed;
+        this.holyGrailAllowExposureUp = holyGrailAllowExposureUp;
+        this.holyGrailAllowExposureDown = holyGrailAllowExposureDown;
     }
 
     void putInIntent(Intent intent) {
@@ -68,6 +91,12 @@ class Settings {
         intent.putExtra(EXTRA_AEL, ael);
         intent.putExtra(EXTRA_BRS, brs);
         intent.putExtra(EXTRA_MF, mf);
+        intent.putExtra(EXTRA_HOLYGRAIL, holyGrail);
+        intent.putExtra(EXTRA_TARGETEXPOSURE, targetExposure);
+        intent.putExtra(EXTRA_MAXSHUTTERSPEED, maxShutterSpeed);
+        intent.putExtra(EXTRA_HOLYGRAILALLOWEXPOSUREUP, holyGrailAllowExposureUp);
+        intent.putExtra(EXTRA_HOLYGRAILALLOWEXPOSUREDOWN, holyGrailAllowExposureDown);
+
     }
 
     static Settings getFromIntent(Intent intent) {
@@ -79,7 +108,12 @@ class Settings {
                 intent.getBooleanExtra(EXTRA_SILENTSHUTTER, true),
                 intent.getBooleanExtra(EXTRA_AEL, false),
                 intent.getBooleanExtra(EXTRA_BRS, false),
-                intent.getBooleanExtra(EXTRA_MF, true)
+                intent.getBooleanExtra(EXTRA_MF, true),
+                intent.getBooleanExtra(EXTRA_HOLYGRAIL, true),
+                intent.getIntExtra(EXTRA_TARGETEXPOSURE, 0),
+                intent.getIntExtra(EXTRA_MAXSHUTTERSPEED, 30),
+                intent.getBooleanExtra(EXTRA_HOLYGRAILALLOWEXPOSUREUP, true),
+                intent.getBooleanExtra(EXTRA_HOLYGRAILALLOWEXPOSUREDOWN, false)
         );
     }
 
@@ -96,6 +130,11 @@ class Settings {
         editor.putBoolean("brs", brs);
         editor.putBoolean("mf", mf);
         editor.putBoolean("displayOff", displayOff);
+        editor.putBoolean("holyGrail", holyGrail);
+        editor.putInt("targetExposure", targetExposure);
+        editor.putInt("maxShutterSpeed", maxShutterSpeed);
+        editor.putBoolean("holyGrailAllowExposureUp", holyGrailAllowExposureUp);
+        editor.putBoolean("holyGrailAllowExposureDown", holyGrailAllowExposureDown);
         editor.apply();
     }
 
@@ -111,5 +150,10 @@ class Settings {
         brs = sharedPref.getBoolean("brs", brs);
         mf = sharedPref.getBoolean("mf", mf);
         displayOff = sharedPref.getBoolean("displayOff", displayOff);
+        holyGrail = sharedPref.getBoolean("holyGrail", holyGrail);
+        targetExposure = sharedPref.getInt("targetExposure", targetExposure);
+        maxShutterSpeed = sharedPref.getInt("maxShutterSpeed", maxShutterSpeed);
+        holyGrailAllowExposureUp = sharedPref.getBoolean("holyGrailAllowExposureUp", holyGrailAllowExposureUp);
+        holyGrailAllowExposureDown = sharedPref.getBoolean("holyGrailAllowExposureDown", holyGrailAllowExposureDown);
     }
 }

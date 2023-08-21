@@ -5,6 +5,7 @@ import android.content.IntentFilter;
 import android.hardware.Camera;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -16,6 +17,7 @@ import com.github.ma1co.pmcademo.app.BaseActivity;
 
 import com.sony.scalar.hardware.CameraEx;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,7 +28,7 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
 
     private int shotCount;
 
-    private TextView tvCount, tvBattery, tvRemaining;
+    private TextView tvCount, tvBattery, tvRemaining, tvExposureLevel;
     private LinearLayout llEnd;
 
     private SurfaceView reviewSurfaceView;
@@ -42,6 +44,8 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
 
     private long shootTime;
     private long shootStartTime;
+
+    private float exposureLevel;
 
     private Display display;
 
@@ -132,6 +136,7 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
         tvCount = (TextView) findViewById(R.id.tvCount);
         tvBattery = (TextView) findViewById(R.id.tvBattery);
         tvRemaining = (TextView) findViewById(R.id.tvRemaining);
+        tvExposureLevel = (TextView) findViewById(R.id.tvExposureLevel);
         llEnd = (LinearLayout) findViewById(R.id.llEnd);
 
         reviewSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
@@ -232,8 +237,32 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
 
         setAutoPowerOffMode(false);
 
+        // Exposure metering
+        cameraEx.setProgramLineRangeOverListener(new CameraEx.ProgramLineRangeOverListener()
+        {
+            @Override
+            public void onAERange(boolean b, boolean b1, boolean b2, CameraEx cameraEx)
+            {
+                //log(String.format("onARRange b %b b1 %b b2 %b\n", Boolean.valueOf(b), Boolean.valueOf(b1), Boolean.valueOf(b2)));
+            }
+
+            @Override
+            public void onEVRange(int ev, CameraEx cameraEx)
+            {
+                exposureLevel = (float)ev / 3.0f;
+                //log(String.format("onEVRange i %d %f\n", ev, (float)ev / 3.0f));
+            }
+
+            @Override
+            public void onMeteringRange(boolean b, CameraEx cameraEx)
+            {
+                //log(String.format("onMeteringRange b %b\n", Boolean.valueOf(b)));
+            }
+        });
+
         tvCount.setText(Integer.toString(shotCount)+"/"+Integer.toString(settings.shotCount * getcnt()));
         tvRemaining.setText(getRemainingTime());
+        tvExposureLevel.setText(String.format("%.1f", exposureLevel));
         tvBattery.setText(getBatteryPercentage());
     }
 
@@ -305,10 +334,13 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
             public void run() {
                 tvCount.setText(Integer.toString(shotCount)+"/"+Integer.toString(settings.shotCount * getcnt()));
                 tvRemaining.setText(getRemainingTime());
+                tvExposureLevel.setText(String.format("%.1f", exposureLevel));
                 tvBattery.setText(getBatteryPercentage());
             }
         });
     }
+
+
 
     private AtomicInteger brck = new AtomicInteger(0);
 
@@ -331,6 +363,7 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
                 public void run() {
                     tvCount.setText(getRemainingTime());
                     tvRemaining.setText("");
+                    tvExposureLevel.setText(String.format("%.1f", exposureLevel));
                     tvBattery.setText(getBatteryPercentage());
                 }
             });
@@ -348,6 +381,7 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
                             tvCount.setText("Thanks for using this app!");
                             tvBattery.setVisibility(View.INVISIBLE);
                             tvRemaining.setVisibility(View.INVISIBLE);
+                            tvExposureLevel.setVisibility(View.INVISIBLE);
                             llEnd.setVisibility(View.VISIBLE);
                         }
                         else {
@@ -423,6 +457,15 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
         else
             return "" + Math.round((settings.shotCount * getcnt() - shotCount) * settings.interval / 60) + "min";
     }
+
+    private String getExposureLevel() {
+        CameraEx.ExposureInfo exposureInfo = new CameraEx.ExposureInfo();
+        CameraEx.ExifInfo exifInfo = new CameraEx.ExifInfo();
+
+        return "1: " + exposureInfo.FNo + " 2: " + exposureInfo.IsoSpeedRate + " 3: " + exposureInfo.ShutterSpeedDeanom + " 4: " + exposureInfo.ShutterSpeedNumber + " 5: " + exifInfo.fNumberNumer;
+    }
+
+
 
     @Override
     protected void onAnyKeyDown() {

@@ -2,11 +2,13 @@ package com.jonasjuffinger.timelapse;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TabHost;
@@ -39,6 +41,16 @@ public class SettingsActivity extends BaseActivity
 
     private AdvancedSeekBar sbDelay;
     private TextView tvDelayValue, tvDelayUnit;
+
+    //Holy grail
+    private LinearLayout laHolyGrailSection;
+    private CheckBox cbHolyGrail;
+    private AdvancedSeekBar sbTargetExposure;
+    private TextView tvTargetExposureValue, tvTargetExposureUnit;
+    private AdvancedSeekBar sbMaxShutterSpeed;
+    private TextView tvMaxShutterSpeedValue, tvMaxShutterSpeedUnit;
+    private CheckBox cbHolyGrailAllowExposureUp;
+    private CheckBox cbHolyGrailAllowExposureDown;
 
     private int fps;
     private Spinner spnFps;
@@ -86,6 +98,38 @@ public class SettingsActivity extends BaseActivity
         sbDelay = (AdvancedSeekBar) findViewById(R.id.sbDelay);
         tvDelayValue = (TextView) findViewById(R.id.tvDelayValue);
         tvDelayUnit = (TextView) findViewById(R.id.tvDelayUnit);
+
+        //Holy Grail
+        laHolyGrailSection = (LinearLayout) findViewById(R.id.laHolyGrailSection);
+        cbHolyGrail = (CheckBox) findViewById(R.id.cbHolyGrail);
+        cbHolyGrail.setChecked(settings.holyGrail);
+        cbHolyGrail.setOnCheckedChangeListener(cbHolyGrailOnCheckListener);
+
+        sbTargetExposure = (AdvancedSeekBar) findViewById(R.id.sbTargetExposure);
+        tvTargetExposureValue = (TextView) findViewById(R.id.tvTargetExposureValue);
+        tvTargetExposureUnit = (TextView) findViewById(R.id.tvTargetExposureUnit);
+        sbTargetExposure.setMax(100);
+        sbTargetExposure.setOnSeekBarChangeListener(sbTargetExposureOnSeekBarChangeListener);
+        sbTargetExposure.setProgress(settings.targetExposure);
+        sbTargetExposureOnSeekBarChangeListener.onProgressChanged(sbTargetExposure, settings.targetExposure, false);
+
+        sbMaxShutterSpeed = (AdvancedSeekBar) findViewById(R.id.sbMaxShutterSpeed);
+        tvMaxShutterSpeedValue = (TextView) findViewById(R.id.tvMaxShutterSpeedValue);
+        tvMaxShutterSpeedUnit = (TextView) findViewById(R.id.tvMaxShutterSpeedUnit);
+        sbMaxShutterSpeed.setMax(30);
+        sbMaxShutterSpeed.setOnSeekBarChangeListener(sbMaxShutterSpeedOnSeekBarChangeListener);
+        sbMaxShutterSpeed.setProgress(settings.maxShutterSpeed);
+        sbMaxShutterSpeedOnSeekBarChangeListener.onProgressChanged(sbMaxShutterSpeed, settings.maxShutterSpeed, false);
+
+        cbHolyGrailAllowExposureUp = (CheckBox) findViewById(R.id.cbHolyGrailAllowExposureUp);
+        cbHolyGrailAllowExposureUp.setChecked(settings.holyGrailAllowExposureUp);
+        cbHolyGrailAllowExposureUp.setOnCheckedChangeListener(cbHolyGrailAllowExposureUpOnCheckListener);
+
+        cbHolyGrailAllowExposureDown = (CheckBox) findViewById(R.id.cbHolyGrailAllowExposureDown);
+        cbHolyGrailAllowExposureDown.setChecked(settings.holyGrailAllowExposureDown);
+        cbHolyGrailAllowExposureDown.setOnCheckedChangeListener(cbHolyGrailAllowExposureDownOnCheckListener);
+        //End Holy Grail
+
 
         cbSilentShutter = (CheckBox) findViewById(R.id.cbSilentShutter);
         cbAEL  = (CheckBox) findViewById(R.id.cbAEL);
@@ -154,7 +198,35 @@ public class SettingsActivity extends BaseActivity
         }
     };
 
-    SeekBar.OnSeekBarChangeListener sbIntervalOnSeekBarChangeListener
+    SeekBar.OnSeekBarChangeListener sbMaxShutterSpeedOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            settings.maxShutterSpeed = i;
+            tvMaxShutterSpeedValue.setText(Integer.toString(i));
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {}
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {}
+    },
+    sbTargetExposureOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            //the seekbar is from 0 to 100, but we want -50 to 50
+            settings.targetExposure = i - 50;
+            tvTargetExposureValue.setText(Integer.toString(settings.targetExposure));
+            tvTargetExposureUnit.setText("EV");
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {}
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {}
+    },
+    sbIntervalOnSeekBarChangeListener
             = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean fromUser) {
@@ -200,7 +272,7 @@ public class SettingsActivity extends BaseActivity
             tvIntervalUnit.setText(intervalUnit);
 
             if(settings.interval == 0)
-                lblShots.setText("Dur. (s)");
+                lblShots.setText("Dur. (s)GF");
             else
                 lblShots.setText("Shots");
 
@@ -337,6 +409,35 @@ public class SettingsActivity extends BaseActivity
         }
     };
 
+    CheckBox.OnCheckedChangeListener cbHolyGrailOnCheckListener = new CheckBox.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+            settings.holyGrail = b;
+            //if holy grail is checked, enable the holy grail settings
+            //else hide them
+            if(b) {
+                laHolyGrailSection.setVisibility(View.VISIBLE);
+            }
+            else {
+                laHolyGrailSection.setVisibility(View.GONE);
+            }
+        }
+    };
+
+    CheckBox.OnCheckedChangeListener cbHolyGrailAllowExposureUpOnCheckListener = new CheckBox.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+            settings.holyGrailAllowExposureUp = b;
+        }
+    };
+
+    CheckBox.OnCheckedChangeListener cbHolyGrailAllowExposureDownOnCheckListener = new CheckBox.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+            settings.holyGrailAllowExposureDown = b;
+        }
+    };
+
     void updateTimes() {
         if(settings.shotCount == Integer.MAX_VALUE)
         {
@@ -385,6 +486,8 @@ public class SettingsActivity extends BaseActivity
         sbInterval.dialChanged(value);
         sbShots.dialChanged(value);
         sbDelay.dialChanged(value);
+        sbTargetExposure.dialChanged(value);
+        sbMaxShutterSpeed.dialChanged(value);
         return true;
     }
 
@@ -392,6 +495,8 @@ public class SettingsActivity extends BaseActivity
         sbInterval.dialChanged(value);
         sbShots.dialChanged(value);
         sbDelay.dialChanged(value);
+        sbTargetExposure.dialChanged(value);
+        sbMaxShutterSpeed.dialChanged(value);
         return true;
     }
 
@@ -399,6 +504,8 @@ public class SettingsActivity extends BaseActivity
         sbInterval.dialChanged(value);
         sbShots.dialChanged(value);
         sbDelay.dialChanged(value);
+        sbTargetExposure.dialChanged(value);
+        sbMaxShutterSpeed.dialChanged(value);
         return true;
     }
 
@@ -406,6 +513,8 @@ public class SettingsActivity extends BaseActivity
         sbInterval.dialChanged(value);
         sbShots.dialChanged(value);
         sbDelay.dialChanged(value);
+        sbTargetExposure.dialChanged(value);
+        sbMaxShutterSpeed.dialChanged(value);
         return true;
     }
 
