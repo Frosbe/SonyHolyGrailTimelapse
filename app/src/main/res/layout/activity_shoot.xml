@@ -71,103 +71,163 @@
             android:layout_height="wrap_content"
             android:text="Holy Grail:" />
 
-        <RelativeLayout
+        <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TableLayout
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#353535">
+
+                <TextView
+                    android:id="@+id/tvExposureLevelLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Current Exposure: " />
+
+                <TextView
+                    android:id="@+id/tvExposureLevel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginRight="10dp"
+                    android:text="0" />
+            </TableRow>
+
+            <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/tvAverageLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Current Average Exposure: " />
 
-                    <TextView
-                        android:id="@+id/tvExposureLevelLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Current Exposure: " />
+                <TextView
+                    android:id="@+id/tvAverageExposure"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:text="0" />
 
-                    <TextView
-                        android:id="@+id/tvExposureLevel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="0dp"
-                        android:layout_marginRight="10dp"
-                        android:text="0" />
-                </TableRow>
+                <TextView
+                    android:id="@+id/tvTargetExposureLevelLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Target exposure: " />
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/tvTargetExposureLevel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0" />
+            </TableRow>
 
-                    <TextView
-                        android:id="@+id/tvLastPictureExposureLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Last Picture Exposure: " />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#353535">
 
-                    <TextView
-                        android:id="@+id/tvLastPictureExposure"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0" />
-                </TableRow>
+                <TextView
+                    android:id="@+id/tvShutterspeedLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Last Picture Shutterspeed: " />
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/tvShutterspeed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="5 sec" />
 
-                    <TextView
-                        android:id="@+id/tvTargetExposureLevelLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Target: " />
+                <TextView
+                    android:id="@+id/tvMaxShutterspeedLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Max Shutterspeed: " />
 
-                    <TextView
-                        android:id="@+id/tvTargetExposureLevel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0" />
-                </TableRow>
+                <TextView
+                    android:id="@+id/tvMaxShutterspeed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="15 sec" />
+            </TableRow>
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-                    <TextView
-                        android:id="@+id/tvLastPictureShutterspeedLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Last Picture Shutterspeed: " />
+                <TextView
+                    android:id="@+id/tvLastPictureISOLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Last Picture ISO: " />
 
-                    <TextView
-                        android:id="@+id/tvLastPictureShutterspeed"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="30 sec" />
-                </TableRow>
+                <TextView
+                    android:id="@+id/tvLastPictureISO"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3200" />
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/tvMaxISOLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Max ISO: " />
 
-                    <TextView
-                        android:id="@+id/tvShotsSinceLastChangeLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Shots since last change: " />
+                <TextView
+                    android:id="@+id/tvMaxISO"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3200" />
+            </TableRow>
 
-                    <TextView
-                        android:id="@+id/tvShotsSinceLastChange"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="30 sec" />
-                </TableRow>
-            </TableLayout>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#353535">
 
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/tvShotsSinceLastChangeLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Shots since last change: " />
+
+                <TextView
+                    android:id="@+id/tvShotsSinceLastChange"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4 pics" />
+
+                <TextView
+                    android:id="@+id/tvCooldownLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cooldown:" />
+
+                <TextView
+                    android:id="@+id/tvCooldown"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="5 pics" />
+
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+            </TableRow>
+        </TableLayout>
+
+        <LinearLayout
+            android:id="@+id/graphLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"/>
 
     </LinearLayout>
 

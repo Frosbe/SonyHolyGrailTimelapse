@@ -291,11 +291,21 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
+                <CheckBox
+                    android:id="@+id/cbUseCurrentExposure"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:checked="true"
+                    android:text="Use current exposure" />
+
                 <RelativeLayout
+                    android:id="@+id/laTargetExposure"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone">
 
                     <TextView
                         android:id="@+id/lblTargetExposure"
@@ -335,7 +345,7 @@
                         android:layout_alignParentTop="true"
                         android:layout_marginRight="10dp"
                         android:layout_toLeftOf="@+id/tvTargetExposureValue"
-                        android:layout_toRightOf="@+id/lblTargetExposure"
+                        android:layout_toRightOf="@id/lblTargetExposure"
                         android:gravity="center_vertical" />
                 </RelativeLayout>
 
@@ -373,7 +383,7 @@
                         android:layout_toLeftOf="@+id/tvMaxShutterSpeedUnit"
                         android:gravity="right|center_vertical"
                         android:text="30"
-                        android:textSize="20sp" />
+                        android:textSize="16sp" />
 
                     <view
                         android:id="@+id/sbMaxShutterSpeed"
@@ -385,6 +395,153 @@
                         android:layout_toLeftOf="@+id/tvMaxShutterSpeedValue"
                         android:layout_toRightOf="@+id/lblMaxShutterSpeed"
                         android:gravity="center_vertical" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/lblMaxISO"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="center_vertical"
+                        android:text="Max ISO"
+                        android:textSize="20sp" />
+
+                    <view
+                        android:id="@+id/sbMaxISO"
+                        class="com.jonasjuffinger.timelapse.AdvancedSeekBar"
+                        android:layout_width="240dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginRight="10dp"
+                        android:layout_toLeftOf="@+id/tvMaxISOValue"
+                        android:layout_toRightOf="@+id/lblMaxISO"
+                        android:gravity="center_vertical" />
+
+                    <TextView
+                        android:id="@+id/tvMaxISOValue"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginRight="5dp"
+                        android:layout_toLeftOf="@+id/tvMaxISOUnit"
+                        android:gravity="right|center_vertical"
+                        android:text="102400"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tvMaxISOUnit"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:gravity="center_vertical"
+                        android:text=""
+                        android:textSize="20sp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/lblCooldown"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="center_vertical"
+                        android:text="Cooldwn"
+                        android:textSize="20sp" />
+
+                    <view
+                        android:id="@+id/sbCooldown"
+                        class="com.jonasjuffinger.timelapse.AdvancedSeekBar"
+                        android:layout_width="240dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginRight="10dp"
+                        android:layout_toLeftOf="@+id/tvCooldownValue"
+                        android:layout_toRightOf="@+id/lblCooldown"
+                        android:gravity="center_vertical" />
+
+                    <TextView
+                        android:id="@+id/tvCooldownValue"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginRight="5dp"
+                        android:layout_toLeftOf="@+id/tvCooldownUnit"
+                        android:gravity="right|center_vertical"
+                        android:text="1"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/tvCooldownUnit"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:gravity="center_vertical"
+                        android:text="pics"
+                        android:textSize="20sp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/lblAverageAmount"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="center_vertical"
+                        android:text="Avg Exp"
+                        android:textSize="20sp" />
+
+                    <view
+                        android:id="@+id/sbAverageAmount"
+                        class="com.jonasjuffinger.timelapse.AdvancedSeekBar"
+                        android:layout_width="240dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginRight="10dp"
+                        android:layout_toLeftOf="@+id/tvAverageAmountValue"
+                        android:layout_toRightOf="@+id/lblAverageAmount"
+                        android:gravity="center_vertical" />
+
+                    <TextView
+                        android:id="@+id/tvAverageAmountValue"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginRight="5dp"
+                        android:layout_toLeftOf="@+id/tvAverageAmountUnit"
+                        android:gravity="right|center_vertical"
+                        android:text="1"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/tvAverageAmountUnit"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:gravity="center_vertical"
+                        android:text="pics"
+                        android:textSize="20sp" />
+
                 </RelativeLayout>
 
                 <RelativeLayout

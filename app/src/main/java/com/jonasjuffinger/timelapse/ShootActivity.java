@@ -1,7 +1,13 @@
 package com.jonasjuffinger.timelapse;
 
+import static com.jonasjuffinger.timelapse.Util.ISO_VALUES;
+import static com.jonasjuffinger.timelapse.Util.SHUTTER_SPEEDS;
+import static com.jonasjuffinger.timelapse.Util.formatShutterSpeed;
+import static com.jonasjuffinger.timelapse.Util.formatShutterSpeedIndex;
+
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.BatteryManager;
 import android.os.Bundle;
@@ -16,10 +22,16 @@ import android.widget.TextView;
 
 import com.github.ma1co.pmcademo.app.BaseActivity;
 
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GraphViewSeries;
+import com.jjoe64.graphview.LineGraphView;
 import com.sony.scalar.hardware.CameraEx;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,7 +41,21 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
 
     private int shotCount;
 
-    private TextView tvCount, tvBattery, tvRemaining, tvExposureLevel, tvLastPictureExposureLevel, tvTargetExposureLevel, tvLastPictureShutterspeed, tvShotsSinceLastChange;
+    private TextView tvCount, tvBattery, tvRemaining;
+
+    //Holy Grail
+    private TextView tvExposureLevel;
+    private TextView tvAverageExposure;
+    private TextView tvTargetExposureLevel;
+    private TextView tvShutterspeed;
+    private TextView tvMaxShutterspeed;
+    private TextView tvLastPictureISO;
+    private TextView tvMaxISO;
+    private TextView tvShotsSinceLastChange;
+    private TextView tvCooldown;
+    //End Holy Grail
+
+    private List<Float> exposureLevelList = new ArrayList<Float>();
 
     private SurfaceView reviewSurfaceView;
     private SurfaceHolder cameraSurfaceHolder;
@@ -46,13 +72,17 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
     private long shootStartTime;
 
     private float exposureLevel = 0;
-    private float lastPictureExposureLevel = 0;
-    private String shutterSpeed = "";
-    private String lastPictureShutterSpeed = "";
-    private double shutterSpeedValue = 0;
-    private int lastHolyGrailSettingUpdateShotCount = -5;
+    private int ISOLevelIndex = 0;
+    private int shutterSpeedIndex = 0;
+    private int shotsSinceLastChange = 0;
+    private float targetExposureLevel = 0.0f;
 
     private Display display;
+
+    GraphViewSeries exposureLevelSeries = new GraphViewSeries(new GraphView.GraphViewData[]{}); // init data
+    //GraphViewSeries targetExposureLevelSeries = new GraphViewSeries(new GraphView.GraphViewData[]{}); // init data
+    //GraphViewSeries shutterSpeedSeries = new GraphViewSeries(new GraphView.GraphViewData[]{}); // init data
+    //GraphViewSeries ISOSeries = new GraphViewSeries(new GraphView.GraphViewData[]{}); // init data
 
 
     int getcnt(){
@@ -126,6 +156,8 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
 
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shoot);
 
@@ -139,16 +171,57 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
         tvCount = (TextView) findViewById(R.id.tvCount);
         tvBattery = (TextView) findViewById(R.id.tvBattery);
         tvRemaining = (TextView) findViewById(R.id.tvRemaining);
-        tvLastPictureExposureLevel = (TextView) findViewById(R.id.tvLastPictureExposure);
-        tvTargetExposureLevel = (TextView) findViewById(R.id.tvTargetExposureLevel);
-        tvLastPictureShutterspeed = (TextView) findViewById(R.id.tvLastPictureShutterspeed);
+
+        //Holy Grail
         tvExposureLevel = (TextView) findViewById(R.id.tvExposureLevel);
+        tvAverageExposure = (TextView) findViewById(R.id.tvAverageExposure);
+        tvTargetExposureLevel = (TextView) findViewById(R.id.tvTargetExposureLevel);
+        tvShutterspeed = (TextView) findViewById(R.id.tvShutterspeed);
+        tvMaxShutterspeed = (TextView) findViewById(R.id.tvMaxShutterspeed);
+        tvLastPictureISO = (TextView) findViewById(R.id.tvLastPictureISO);
+        tvMaxISO = (TextView) findViewById(R.id.tvMaxISO);
         tvShotsSinceLastChange = (TextView) findViewById(R.id.tvShotsSinceLastChange);
+        tvCooldown = (TextView) findViewById(R.id.tvCooldown);
+        //end Holy Grail
+
+        if (settings.useCurrentExposure){
+            targetExposureLevel = exposureLevel;
+        } else {
+            targetExposureLevel = settings.targetExposure;
+        }
+
+        if (settings.holyGrailAllowExposureUp && !settings.holyGrailAllowExposureDown){
+            ISOLevelIndex = 0;
+        }
+
+        if (settings.holyGrailAllowExposureDown && !settings.holyGrailAllowExposureUp){
+            ISOLevelIndex = ISO_VALUES.length - 1;
+        }
+
+        if (settings.holyGrailAllowExposureDown && settings.holyGrailAllowExposureUp){
+            ISOLevelIndex = ISO_VALUES.length / 2;
+        }
 
         reviewSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
         reviewSurfaceView.setZOrderOnTop(false);
         cameraSurfaceHolder = reviewSurfaceView.getHolder();
         cameraSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+        GraphView graphView = new LineGraphView(
+                this // context
+                , "ExposureLevel" // heading
+        );
+
+
+
+        exposureLevelSeries.getStyle().color = Color.RED;
+        graphView.addSeries(exposureLevelSeries); // data
+        //graphView.addSeries(targetExposureLevelSeries); // data
+        //graphView.addSeries(shutterSpeedSeries); // data
+        //graphView.addSeries(ISOSeries); // data
+
+        LinearLayout layout = (LinearLayout) findViewById(R.id.graphLayout);
+        //layout.addView(graphView);
     }
 
 
@@ -175,6 +248,10 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
         catch(Exception ignored)
         {}
 
+        /*log("reset graph data");
+        exposureLevelSeries.resetData(new GraphView.GraphViewData[]{});
+        targetExposureLevelSeries.resetData(new GraphView.GraphViewData[]{});
+        shutterSpeedSeries.resetData(new GraphView.GraphViewData[]{});*/
 
         final CameraEx.ParametersModifier modifier = cameraEx.createParametersModifier(params);
 
@@ -256,7 +333,12 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
             public void onEVRange(int ev, CameraEx cameraEx)
             {
                 exposureLevel = (float)ev / 3.0f;
-                tvExposureLevel.setText(String.format("%.1f", exposureLevel));
+                if (settings.useCurrentExposure){
+                    targetExposureLevel = exposureLevel;
+                    settings.useCurrentExposure = false;
+                    updateScreen();
+                }
+                tvExposureLevel.setText(String.format("%.2f", exposureLevel));
                 //log(String.format("onEVRange i %d %f\n", ev, (float)ev / 3.0f));
             }
 
@@ -268,18 +350,38 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
         });
 
         updateShutterSpeed();
-
-        lastPictureExposureLevel = exposureLevel;
-        lastPictureShutterSpeed = shutterSpeed;
+        updateISOLevel();
         updateScreen();
     }
 
     private void updateShutterSpeed(){
+        log("updateShutterSpeed");
         final Camera.Parameters params = cameraEx.getNormalCamera().getParameters();
         final CameraEx.ParametersModifier paramsModifier = cameraEx.createParametersModifier(params);
         Pair<Integer, Integer> sp = paramsModifier.getShutterSpeed();
-        shutterSpeed = String.format("%d/%d", sp.first, sp.second);
-        shutterSpeedValue = (float)sp.first / (float)sp.second;
+
+        //find the shutterspeed in the list (list of int[][])
+        for(int i = 0; i < SHUTTER_SPEEDS.length; i++){
+            if(SHUTTER_SPEEDS[i][0] == sp.first && SHUTTER_SPEEDS[i][1] == sp.second){
+                shutterSpeedIndex = i;
+                break;
+            }
+        }
+        log("shutterSpeedIndex: " + shutterSpeedIndex);
+    }
+
+    private void updateISOLevel(){
+        log("updateISOLevel");
+        final Camera.Parameters params = cameraEx.getNormalCamera().getParameters();
+        final CameraEx.ParametersModifier paramsModifier = cameraEx.createParametersModifier(params);
+        int iso = paramsModifier.getISOSensitivity();
+        for(int i = 0; i < ISO_VALUES.length; i++){
+            if(ISO_VALUES[i] == iso){
+                ISOLevelIndex = i;
+                break;
+            }
+        }
+        log("ISOLevelIndex: " + ISOLevelIndex);
     }
 
     private void updateScreen(){
@@ -288,11 +390,31 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
         tvBattery.setText(getBatteryPercentage());
 
         //Holy Grail
-        tvLastPictureExposureLevel.setText(String.format("%.1f", lastPictureExposureLevel));
-        tvLastPictureShutterspeed.setText(lastPictureShutterSpeed);
-        tvTargetExposureLevel.setText(String.format("%.2f", (settings.targetExposure) / 3.0f));
-        tvShotsSinceLastChange.setText(Integer.toString(shotCount - lastHolyGrailSettingUpdateShotCount));
+        tvAverageExposure.setText(String.format("%.2f", (getAverageExposure(settings.averageExposureAmount))));
+        tvTargetExposureLevel.setText(String.format("%.2f", targetExposureLevel));
+        tvShutterspeed.setText(formatShutterSpeedIndex(shutterSpeedIndex));
+        tvMaxShutterspeed.setText(formatShutterSpeedIndex(settings.maxShutterSpeedIndex));
+        tvLastPictureISO.setText(Integer.toString(ISO_VALUES[ISOLevelIndex]));
+        tvMaxISO.setText(Integer.toString(ISO_VALUES[settings.maxISOIndex]));
+        tvShotsSinceLastChange.setText(Integer.toString(shotsSinceLastChange));
+        tvCooldown.setText(Integer.toString(settings.cooldown));
 
+
+    }
+
+    private float getAverageExposure(int shotCount){
+        //get the average value of the last "shotCount" values in the exposureLevelList, or list.size() if list.size() < shotCount
+        float sum = 0;
+        int count = 0;
+        for(int i = exposureLevelList.size() - 1; i >= 0 && count < shotCount; i--){
+            sum += exposureLevelList.get(i);
+            count++;
+        }
+        if (count == 0){
+            return 0;
+        } else {
+            return sum / count;
+        }
     }
 
     @Override
@@ -353,17 +475,24 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
     {
         int numerator = shutterSpeedInfo.currentShutterSpeed_n;
         int denominator = shutterSpeedInfo.currentShutterSpeed_d;
-        final String formattedShutterSpeed = String.format("%d/%d", numerator, denominator);
-        shutterSpeed = formattedShutterSpeed;
-        log("shutter speed changed to " + formattedShutterSpeed);
-        shutterSpeedValue = (float)numerator / (float)denominator;
+        //find the shutterspeed in the list (list of int[][])
+        int shutterSpeedIndex = 0;
+        for(int i = 0; i < SHUTTER_SPEEDS.length; i++){
+            if(SHUTTER_SPEEDS[i][0] == numerator && SHUTTER_SPEEDS[i][1] == denominator){
+                shutterSpeedIndex = i;
+                break;
+            }
+        }
     }
+
+
 
     private void shoot() {
         if(takingPicture)
             return;
 
         if (settings.holyGrail){
+            addPointsToGraph();
             holyGrailPrePhotoEvent();
         }
 
@@ -371,9 +500,9 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
         cameraEx.burstableTakePicture();
 
         shotCount++;
+        shotsSinceLastChange++;
 
-        lastPictureExposureLevel = exposureLevel;
-        lastPictureShutterSpeed = shutterSpeed;
+        exposureLevelList.add(exposureLevel);
 
         runOnUiThread(new Runnable() {
             @Override
@@ -383,115 +512,86 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
         });
     }
 
+    private void addPointsToGraph(){
+        log("addPointsToGraph" + shotCount + ", exposureLevel: " + exposureLevel + ", target:" + targetExposureLevel);
+        exposureLevelSeries.appendData(new GraphView.GraphViewData(shotCount, exposureLevel+10), false);
+        //targetExposureLevelSeries.appendData(new GraphView.GraphViewData(shotCount, targetExposureLevel), false);
+        //shutterSpeedSeries.appendData(new GraphView.GraphViewData(shotCount, shutterSpeedValue), false);
+    }
+
     private void holyGrailPrePhotoEvent(){
+        float usableExposureLevel = getAverageExposure(settings.averageExposureAmount);
+        int cooldown = settings.cooldown;
+        float deadbandSize = 0.5f;
 
-        float targetExposureLevel = (settings.targetExposure) / 3.0f;
-        log("targetExposureLevel: " + targetExposureLevel);
-        //if holy grail is enabled
+
         if (settings.holyGrail){
-            log("holy grail enabled");
-            //if it has been more than 5 shots since the last holy grail setting change
-            if (shotCount - lastHolyGrailSettingUpdateShotCount >= 5){
-                log("more than 5 shots since last holy grail setting change");
-                //if we are allowed to exposure up
-                if (settings.holyGrailAllowExposureUp){
-                    log("holy grail allow exposure up");
-                    //do we need to exposure up?
-                    log("exposureLevel: " + exposureLevel);
-                    log("targetExposureLevel - 0.7f: " + (targetExposureLevel - 0.7f));
-                    if (exposureLevel < targetExposureLevel - 0.7f){
-                        log("exposureLevel < targetExposureLevel - 0.7f");
-                        //exposure up
-                        //can we increase shutter speed?
 
-                        log("shutterSpeedValue: " + shutterSpeedValue);
-                        log("settings.MaxShutterSpeed: " + settings.maxShutterSpeed);
-                        if (shutterSpeedValue < settings.maxShutterSpeed){
-                            log("shutterSpeedValue < settings.MaxShutterSpeed");
+            if (shotsSinceLastChange >= cooldown){
+
+                if (usableExposureLevel < targetExposureLevel - deadbandSize){
+
+                    if (settings.holyGrailAllowExposureUp) {
+                        log("trying to get higher exposure");
+
+                        if (shutterSpeedIndex < settings.maxShutterSpeedIndex){
+                            log("shutter speed is less than max shutter speed");
                             //make the shutter open longer
                             cameraEx.decrementShutterSpeed();
-                            lastHolyGrailSettingUpdateShotCount = shotCount;
-                        }
-                        else{
-
+                            shotsSinceLastChange = 0;
+                        } else if (ISOLevelIndex < settings.maxISOIndex){
+                            log("ISO is less than max ISO");
                             //increase ISO
                             incrementISO();
-                            lastHolyGrailSettingUpdateShotCount = shotCount;
+                        } else {
+                            log("can't increase shutter speed or ISO");
                         }
                     }
                 }
 
-                //if we are allowed to exposure down
-                if (settings.holyGrailAllowExposureDown){
-                    log("holy grail allow exposure down");
-                    //do we need to exposure down?
-                    log("exposureLevel: " + exposureLevel);
-                    log("targetExposureLevel + 0.7f: " + (targetExposureLevel + 0.7f));
-                    if (exposureLevel > targetExposureLevel + 0.7f){
-                        log("exposureLevel > targetExposureLevel + 0.7f");
-                        //exposure down
-                        //can we decrease shutter speed?
-                        //get the minimum shutter speed value
+                if (usableExposureLevel > targetExposureLevel + deadbandSize){
 
-                        if (shutterSpeedValue > 1/8000){
-                            log("shutterSpeedValue > 1/8000");
-                            //make the shutter open shorter
-                            cameraEx.incrementShutterSpeed();
-                            lastHolyGrailSettingUpdateShotCount = shotCount;
-                        }
-                        else{
+                    if (settings.holyGrailAllowExposureDown) {
+                        if (ISOLevelIndex > 0){
                             //decrease ISO
                             decrementISO();
-                            lastHolyGrailSettingUpdateShotCount = shotCount;
+                        } else if (shutterSpeedIndex > 0){
+                            //make the shutter open shorter
+                            cameraEx.incrementShutterSpeed();
+                            shotsSinceLastChange = 0;
+                        } else {
+                            log("can't decrease shutter speed or ISO");
                         }
                     }
                 }
             }
         }
         updateShutterSpeed();
+        updateISOLevel();
+        updateScreen();
     }
 
     private void incrementISO(){
         log("incrementISO");
-        Camera.Parameters params = cameraEx.createEmptyParameters();
-
-        //get the list of supported ISO values list of ints
-        List<String> supportedISOs = cameraEx.createParametersModifier(params).getSupportedISOSensitivities();
-
-        //get the current ISO value
-        int currentISO = cameraEx.createParametersModifier(params).getISOSensitivity();
-
-        //find the index of the current ISO value
-        int currentISOIndex = supportedISOs.indexOf(Integer.toString(currentISO));
-
-        //if the current ISO value is not the last in the list
-        if (currentISOIndex < supportedISOs.size() - 1){
-            //set the ISO value to the next one in the list, parse it to an int
-            cameraEx.createParametersModifier(params).setISOSensitivity(Integer.parseInt(supportedISOs.get(currentISOIndex + 1)));
-            //set the camera parameters
+        ISOLevelIndex++;
+        if (ISOLevelIndex < ISO_VALUES.length){
+            Camera.Parameters params = cameraEx.createEmptyParameters();
+            cameraEx.createParametersModifier(params).setISOSensitivity(ISO_VALUES[ISOLevelIndex]);
             cameraEx.getNormalCamera().setParameters(params);
+        } else {
+            log("can't increase ISO");
         }
     }
 
     private void decrementISO(){
         log("decrementISO");
-        Camera.Parameters params = cameraEx.createEmptyParameters();
-
-        //get the list of supported ISO values list of ints
-        List<String> supportedISOs = cameraEx.createParametersModifier(params).getSupportedISOSensitivities();
-
-        //get the current ISO value
-        int currentISO = cameraEx.createParametersModifier(params).getISOSensitivity();
-
-        //find the index of the current ISO value
-        int currentISOIndex = supportedISOs.indexOf(Integer.toString(currentISO));
-
-        //if the current ISO value is not the first in the list
-        if (currentISOIndex > 0){
-            //set the ISO value to the previous one in the list, parse it to an int
-            cameraEx.createParametersModifier(params).setISOSensitivity(Integer.parseInt(supportedISOs.get(currentISOIndex - 1)));
-            //set the camera parameters
+        ISOLevelIndex--;
+        if (ISOLevelIndex >= 0){
+            Camera.Parameters params = cameraEx.createEmptyParameters();
+            cameraEx.createParametersModifier(params).setISOSensitivity(ISO_VALUES[ISOLevelIndex]);
             cameraEx.getNormalCamera().setParameters(params);
+        } else {
+            log("can't decrease ISO");
         }
     }
 
@@ -566,13 +666,13 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
                 // show the preview picture for some time
                 else {
                     long previewPictureShowTime = Math.round(Math.min(remainingTime, pictureReviewTime * 1000));
-                    log("  Stop preview in: " + previewPictureShowTime);
+                    //log("  Stop preview in: " + previewPictureShowTime);
                     reviewSurfaceView.setVisibility(View.VISIBLE);
                     stopPicturePreview = true;
                     shootRunnableHandler.postDelayed(shootRunnable, previewPictureShowTime);
                 }
             } else {
-                stopPicturePreview = true;
+                //stopPicturePreview = true;
                 shootRunnableHandler.postDelayed(shootRunnable, pictureReviewTime * 1000);
             }
         }
@@ -636,6 +736,8 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
 
 
     private void log(String s) {
+        //add timestamp
+        s = new SimpleDateFormat("HH:mm:ss.SSS").format(new Date()) + " " + s;
         Logger.info(s);
     }
 
@@ -654,4 +756,6 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
             log("null");
         log("\n");
     }
+
+
 }

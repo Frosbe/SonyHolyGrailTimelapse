@@ -22,15 +22,18 @@ class Settings {
     private static final String EXTRA_BRS = "com.jonasjuffinger.timelapse.BRS";
     private static final String EXTRA_MF = "com.jonasjuffinger.timelapse.MF";
     private static final String EXTRA_HOLYGRAIL = "com.jonasjuffinger.timelapse.HOLYGRAIL";
+    private static final String EXTRA_USECURRENTEXPOSURE = "com.jonasjuffinger.timelapse.USECURRENTEXPOSURE";
     private static final String EXTRA_TARGETEXPOSURE = "com.jonasjuffinger.timelapse.TARGETEXPOSURE";
-    private static final String EXTRA_MAXSHUTTERSPEED = "com.jonasjuffinger.timelapse.MAXSHUTTERSPEED";
+    private static final String EXTRA_MAXSHUTTERSPEEDINDEX = "com.jonasjuffinger.timelapse.MAXSHUTTERSPEEDINDEX";
+    private static final String EXTRA_MAXISOINDEX = "com.jonasjuffinger.timelapse.MAXISOINDEX";
+    private static final String EXTRA_COOLDOWN = "com.jonasjuffinger.timelapse.COOLDOWN";
+    private static final String EXTRA_AVERAGEEXPOSUREAMOUNT = "com.jonasjuffinger.timelapse.AVERAGEEXPOSUREAMOUNT";
     private static final String EXTRA_HOLYGRAILALLOWEXPOSUREUP = "com.jonasjuffinger.timelapse.HOLYGRAILALLOWEXPOSUREUP";
     private static final String EXTRA_HOLYGRAILALLOWEXPOSUREDOWN = "com.jonasjuffinger.timelapse.HOLYGRAILALLOWEXPOSUREDOWN";
 
 
     double interval;
     int delay;
-    int MaxShutterSpeed;
     int rawInterval, rawDelay;
     int shotCount, rawShotCount;
     boolean displayOff;
@@ -40,8 +43,12 @@ class Settings {
     boolean brs;
     boolean mf;
     boolean holyGrail;
+    boolean useCurrentExposure;
     int targetExposure;
-    int maxShutterSpeed;
+    int maxShutterSpeedIndex;
+    int maxISOIndex;
+    int cooldown;
+    int averageExposureAmount;
     boolean holyGrailAllowExposureUp;
     boolean holyGrailAllowExposureDown;
 
@@ -60,13 +67,17 @@ class Settings {
         brs = true;
         mf = true;
         holyGrail = true;
+        useCurrentExposure = true;
         targetExposure = 0; //0
-        maxShutterSpeed = 0;
+        maxShutterSpeedIndex = 0;
+        maxISOIndex = 0;
+        cooldown = 5;
+        averageExposureAmount = 1;
         holyGrailAllowExposureUp = true;
         holyGrailAllowExposureDown = false;
     }
 
-    public Settings(double interval, int shotCount, int delay, boolean displayOff, boolean silentShutter, boolean ael, boolean brs, boolean mf, boolean holyGrail, int targetExposure, int maxShutterSpeed, boolean holyGrailAllowExposureUp, boolean holyGrailAllowExposureDown) {
+    public Settings(double interval, int shotCount, int delay, boolean displayOff, boolean silentShutter, boolean ael, boolean brs, boolean mf, boolean holyGrail, boolean useCurrentExposure, int targetExposure, int maxShutterSpeed, int maxISO, int cooldown, int averageExposureAmount, boolean holyGrailAllowExposureUp, boolean holyGrailAllowExposureDown) {
         this.interval = interval;
         this.delay = delay;
         this.shotCount = shotCount;
@@ -76,8 +87,12 @@ class Settings {
         this.brs = brs;
         this.mf = mf;
         this.holyGrail = holyGrail;
+        this.useCurrentExposure = useCurrentExposure;
         this.targetExposure = targetExposure;
-        this.maxShutterSpeed = maxShutterSpeed;
+        this.maxShutterSpeedIndex = maxShutterSpeed;
+        this.maxISOIndex = maxISO;
+        this.cooldown = cooldown;
+        this.averageExposureAmount = averageExposureAmount;
         this.holyGrailAllowExposureUp = holyGrailAllowExposureUp;
         this.holyGrailAllowExposureDown = holyGrailAllowExposureDown;
     }
@@ -92,8 +107,12 @@ class Settings {
         intent.putExtra(EXTRA_BRS, brs);
         intent.putExtra(EXTRA_MF, mf);
         intent.putExtra(EXTRA_HOLYGRAIL, holyGrail);
+        intent.putExtra(EXTRA_USECURRENTEXPOSURE, useCurrentExposure);
         intent.putExtra(EXTRA_TARGETEXPOSURE, targetExposure);
-        intent.putExtra(EXTRA_MAXSHUTTERSPEED, maxShutterSpeed);
+        intent.putExtra(EXTRA_MAXSHUTTERSPEEDINDEX, maxShutterSpeedIndex);
+        intent.putExtra(EXTRA_MAXISOINDEX, maxISOIndex);
+        intent.putExtra(EXTRA_COOLDOWN, cooldown);
+        intent.putExtra(EXTRA_AVERAGEEXPOSUREAMOUNT, averageExposureAmount);
         intent.putExtra(EXTRA_HOLYGRAILALLOWEXPOSUREUP, holyGrailAllowExposureUp);
         intent.putExtra(EXTRA_HOLYGRAILALLOWEXPOSUREDOWN, holyGrailAllowExposureDown);
 
@@ -110,8 +129,12 @@ class Settings {
                 intent.getBooleanExtra(EXTRA_BRS, false),
                 intent.getBooleanExtra(EXTRA_MF, true),
                 intent.getBooleanExtra(EXTRA_HOLYGRAIL, true),
+                intent.getBooleanExtra(EXTRA_USECURRENTEXPOSURE, true),
                 intent.getIntExtra(EXTRA_TARGETEXPOSURE, 0),
-                intent.getIntExtra(EXTRA_MAXSHUTTERSPEED, 30),
+                intent.getIntExtra(EXTRA_MAXSHUTTERSPEEDINDEX, 0),
+                intent.getIntExtra(EXTRA_MAXISOINDEX, 0),
+                intent.getIntExtra(EXTRA_COOLDOWN, 5),
+                intent.getIntExtra(EXTRA_AVERAGEEXPOSUREAMOUNT, 1),
                 intent.getBooleanExtra(EXTRA_HOLYGRAILALLOWEXPOSUREUP, true),
                 intent.getBooleanExtra(EXTRA_HOLYGRAILALLOWEXPOSUREDOWN, false)
         );
@@ -131,8 +154,12 @@ class Settings {
         editor.putBoolean("mf", mf);
         editor.putBoolean("displayOff", displayOff);
         editor.putBoolean("holyGrail", holyGrail);
+        editor.putBoolean("useCurrentExposure", useCurrentExposure);
         editor.putInt("targetExposure", targetExposure);
-        editor.putInt("maxShutterSpeed", maxShutterSpeed);
+        editor.putInt("maxShutterSpeedIndex", maxShutterSpeedIndex);
+        editor.putInt("maxIsoIndex", maxISOIndex);
+        editor.putInt("cooldown", cooldown);
+        editor.putInt("averageExposureAmount", averageExposureAmount);
         editor.putBoolean("holyGrailAllowExposureUp", holyGrailAllowExposureUp);
         editor.putBoolean("holyGrailAllowExposureDown", holyGrailAllowExposureDown);
         editor.apply();
@@ -151,9 +178,14 @@ class Settings {
         mf = sharedPref.getBoolean("mf", mf);
         displayOff = sharedPref.getBoolean("displayOff", displayOff);
         holyGrail = sharedPref.getBoolean("holyGrail", holyGrail);
+        useCurrentExposure = sharedPref.getBoolean("useCurrentExposure", useCurrentExposure);
         targetExposure = sharedPref.getInt("targetExposure", targetExposure);
-        maxShutterSpeed = sharedPref.getInt("maxShutterSpeed", maxShutterSpeed);
+        maxShutterSpeedIndex = sharedPref.getInt("maxShutterSpeedIndex", maxShutterSpeedIndex);
+        maxISOIndex = sharedPref.getInt("maxIsoIndex", maxISOIndex);
+        cooldown = sharedPref.getInt("cooldown", cooldown);
+        averageExposureAmount = sharedPref.getInt("averageExposureAmount", averageExposureAmount);
         holyGrailAllowExposureUp = sharedPref.getBoolean("holyGrailAllowExposureUp", holyGrailAllowExposureUp);
         holyGrailAllowExposureDown = sharedPref.getBoolean("holyGrailAllowExposureDown", holyGrailAllowExposureDown);
     }
+
 }

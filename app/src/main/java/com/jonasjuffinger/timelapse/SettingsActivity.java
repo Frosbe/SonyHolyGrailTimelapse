@@ -1,6 +1,11 @@
 package com.jonasjuffinger.timelapse;
 
+import static com.jonasjuffinger.timelapse.Util.ISO_VALUES;
+import static com.jonasjuffinger.timelapse.Util.SHUTTER_SPEEDS;
+import static com.jonasjuffinger.timelapse.Util.formatShutterSpeed;
+
 import android.content.Intent;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.text.Layout;
 import android.view.View;
@@ -9,6 +14,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TabHost;
@@ -19,11 +25,15 @@ import com.sony.scalar.hardware.CameraEx;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SettingsActivity extends BaseActivity
 {
     private SettingsActivity that = this;
 
     private Settings settings;
+    private CameraEx cameraEx;
 
     private TabHost tabHost;
 
@@ -45,12 +55,20 @@ public class SettingsActivity extends BaseActivity
     //Holy grail
     private LinearLayout laHolyGrailSection;
     private CheckBox cbHolyGrail;
+    private RelativeLayout laTargetExposure;
+    private CheckBox cbUseCurrentExposure;
     private AdvancedSeekBar sbTargetExposure;
     private TextView tvTargetExposureValue, tvTargetExposureUnit;
     private AdvancedSeekBar sbMaxShutterSpeed;
     private TextView tvMaxShutterSpeedValue, tvMaxShutterSpeedUnit;
     private CheckBox cbHolyGrailAllowExposureUp;
     private CheckBox cbHolyGrailAllowExposureDown;
+    private AdvancedSeekBar sbMaxISO;
+    private TextView tvMaxISOValue, tvMaxISOUnit;
+    private AdvancedSeekBar sbCooldown;
+    private TextView tvCooldownValue, tvCooldownUnit;
+    private AdvancedSeekBar sbAverageAmount;
+    private TextView tvAverageAmountValue, tvAverageAmountUnit;
 
     private int fps;
     private Spinner spnFps;
@@ -61,12 +79,14 @@ public class SettingsActivity extends BaseActivity
     private CheckBox cbMF;
     private CheckBox cbDOFF;
 
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-
         if (!(Thread.getDefaultUncaughtExceptionHandler() instanceof CustomExceptionHandler))
             Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler());
 
@@ -75,6 +95,7 @@ public class SettingsActivity extends BaseActivity
         settings = new Settings();
         settings.load(this);
         fps = 24;
+
 
         bnStart = (Button) findViewById(R.id.bnStart);
         bnStart.setOnClickListener(bnStartOnClickListener);
@@ -105,6 +126,8 @@ public class SettingsActivity extends BaseActivity
         cbHolyGrail.setChecked(settings.holyGrail);
         cbHolyGrail.setOnCheckedChangeListener(cbHolyGrailOnCheckListener);
 
+        laTargetExposure = (RelativeLayout) findViewById(R.id.laTargetExposure);
+
         sbTargetExposure = (AdvancedSeekBar) findViewById(R.id.sbTargetExposure);
         tvTargetExposureValue = (TextView) findViewById(R.id.tvTargetExposureValue);
         tvTargetExposureUnit = (TextView) findViewById(R.id.tvTargetExposureUnit);
@@ -113,13 +136,17 @@ public class SettingsActivity extends BaseActivity
         sbTargetExposure.setProgress(settings.targetExposure);
         sbTargetExposureOnSeekBarChangeListener.onProgressChanged(sbTargetExposure, settings.targetExposure, false);
 
+        cbUseCurrentExposure = (CheckBox) findViewById(R.id.cbUseCurrentExposure);
+        cbUseCurrentExposure.setChecked(settings.useCurrentExposure);
+        cbUseCurrentExposure.setOnCheckedChangeListener(cbUseCurrentExposureOnCheckListener);
+
         sbMaxShutterSpeed = (AdvancedSeekBar) findViewById(R.id.sbMaxShutterSpeed);
         tvMaxShutterSpeedValue = (TextView) findViewById(R.id.tvMaxShutterSpeedValue);
         tvMaxShutterSpeedUnit = (TextView) findViewById(R.id.tvMaxShutterSpeedUnit);
-        sbMaxShutterSpeed.setMax(30);
+        sbMaxShutterSpeed.setMax(SHUTTER_SPEEDS.length - 1);
         sbMaxShutterSpeed.setOnSeekBarChangeListener(sbMaxShutterSpeedOnSeekBarChangeListener);
-        sbMaxShutterSpeed.setProgress(settings.maxShutterSpeed);
-        sbMaxShutterSpeedOnSeekBarChangeListener.onProgressChanged(sbMaxShutterSpeed, settings.maxShutterSpeed, false);
+        sbMaxShutterSpeed.setProgress(settings.maxShutterSpeedIndex);
+        sbMaxShutterSpeedOnSeekBarChangeListener.onProgressChanged(sbMaxShutterSpeed, settings.maxShutterSpeedIndex, false);
 
         cbHolyGrailAllowExposureUp = (CheckBox) findViewById(R.id.cbHolyGrailAllowExposureUp);
         cbHolyGrailAllowExposureUp.setChecked(settings.holyGrailAllowExposureUp);
@@ -128,6 +155,31 @@ public class SettingsActivity extends BaseActivity
         cbHolyGrailAllowExposureDown = (CheckBox) findViewById(R.id.cbHolyGrailAllowExposureDown);
         cbHolyGrailAllowExposureDown.setChecked(settings.holyGrailAllowExposureDown);
         cbHolyGrailAllowExposureDown.setOnCheckedChangeListener(cbHolyGrailAllowExposureDownOnCheckListener);
+
+        sbMaxISO = (AdvancedSeekBar) findViewById(R.id.sbMaxISO);
+        tvMaxISOValue = (TextView) findViewById(R.id.tvMaxISOValue);
+        tvMaxISOUnit = (TextView) findViewById(R.id.tvMaxISOUnit);
+        sbMaxISO.setMax(ISO_VALUES.length - 1);
+        sbMaxISO.setOnSeekBarChangeListener(sbMaxISOOnSeekBarChangeListener);
+        sbMaxISO.setProgress(settings.maxISOIndex);
+        sbMaxISOOnSeekBarChangeListener.onProgressChanged(sbMaxISO, settings.maxISOIndex, false);
+
+        sbCooldown = (AdvancedSeekBar) findViewById(R.id.sbCooldown);
+        tvCooldownValue = (TextView) findViewById(R.id.tvCooldownValue);
+        tvCooldownUnit = (TextView) findViewById(R.id.tvCooldownUnit);
+        sbCooldown.setMax(100);
+        sbCooldown.setOnSeekBarChangeListener(sbCooldownOnSeekBarChangeListener);
+        sbCooldown.setProgress(settings.cooldown);
+        sbCooldownOnSeekBarChangeListener.onProgressChanged(sbCooldown, settings.cooldown, false);
+
+        sbAverageAmount = (AdvancedSeekBar) findViewById(R.id.sbAverageAmount);
+        tvAverageAmountValue = (TextView) findViewById(R.id.tvAverageAmountValue);
+        tvAverageAmountUnit = (TextView) findViewById(R.id.tvAverageAmountUnit);
+        sbAverageAmount.setMax(100);
+        sbAverageAmount.setOnSeekBarChangeListener(sbAverageAmountOnSeekBarChangeListener);
+        sbAverageAmount.setProgress(settings.averageExposureAmount);
+        sbAverageAmountOnSeekBarChangeListener.onProgressChanged(sbAverageAmount, settings.averageExposureAmount, false);
+
         //End Holy Grail
 
 
@@ -179,6 +231,10 @@ public class SettingsActivity extends BaseActivity
         /*}
         catch(Exception ignored)
         {}*/
+
+
+
+
     }
 
     View.OnClickListener bnStartOnClickListener = new View.OnClickListener() {
@@ -201,8 +257,55 @@ public class SettingsActivity extends BaseActivity
     SeekBar.OnSeekBarChangeListener sbMaxShutterSpeedOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            settings.maxShutterSpeed = i;
-            tvMaxShutterSpeedValue.setText(Integer.toString(i));
+            //set the shutter speed to the index of the list, show the value
+            settings.maxShutterSpeedIndex = i;
+
+            tvMaxShutterSpeedValue.setText( formatShutterSpeed(SHUTTER_SPEEDS[i][0], SHUTTER_SPEEDS[i][1]) );
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {}
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {}
+    },
+    sbMaxISOOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            //get the ISO value from the list
+            settings.maxISOIndex = i;
+
+            tvMaxISOValue.setText( Integer.toString(ISO_VALUES[i]) );
+            tvMaxISOUnit.setText("ISO");
+
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {}
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {}
+    },
+    sbCooldownOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            settings.cooldown = i;
+            tvCooldownValue.setText(Integer.toString(i));
+            tvCooldownUnit.setText("pics");
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {}
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {}
+    },
+    sbAverageAmountOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            settings.averageExposureAmount = i;
+            tvAverageAmountValue.setText(Integer.toString(i));
+            tvAverageAmountUnit.setText("pics");
         }
 
         @Override
@@ -425,6 +528,18 @@ public class SettingsActivity extends BaseActivity
         }
     };
 
+    CheckBox.OnCheckedChangeListener cbUseCurrentExposureOnCheckListener = new CheckBox.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+            settings.useCurrentExposure = b;
+            if (b) {
+                laTargetExposure.setVisibility(View.GONE);
+            } else {
+                laTargetExposure.setVisibility(View.VISIBLE);
+            }
+        }
+    };
+
     CheckBox.OnCheckedChangeListener cbHolyGrailAllowExposureUpOnCheckListener = new CheckBox.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -489,6 +604,9 @@ public class SettingsActivity extends BaseActivity
         sbDelay.dialChanged(value);
         sbTargetExposure.dialChanged(value);
         sbMaxShutterSpeed.dialChanged(value);
+        sbMaxISO.dialChanged(value);
+        sbCooldown.dialChanged(value);
+        sbAverageAmount.dialChanged(value);
         return true;
     }
 
@@ -498,6 +616,9 @@ public class SettingsActivity extends BaseActivity
         sbDelay.dialChanged(value);
         sbTargetExposure.dialChanged(value);
         sbMaxShutterSpeed.dialChanged(value);
+        sbMaxISO.dialChanged(value);
+        sbCooldown.dialChanged(value);
+        sbAverageAmount.dialChanged(value);
         return true;
     }
 
@@ -507,6 +628,9 @@ public class SettingsActivity extends BaseActivity
         sbDelay.dialChanged(value);
         sbTargetExposure.dialChanged(value);
         sbMaxShutterSpeed.dialChanged(value);
+        sbMaxISO.dialChanged(value);
+        sbCooldown.dialChanged(value);
+        sbAverageAmount.dialChanged(value);
         return true;
     }
 
@@ -516,6 +640,9 @@ public class SettingsActivity extends BaseActivity
         sbDelay.dialChanged(value);
         sbTargetExposure.dialChanged(value);
         sbMaxShutterSpeed.dialChanged(value);
+        sbMaxISO.dialChanged(value);
+        sbCooldown.dialChanged(value);
+        sbAverageAmount.dialChanged(value);
         return true;
     }
 
