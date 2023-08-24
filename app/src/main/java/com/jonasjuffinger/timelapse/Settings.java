@@ -28,6 +28,7 @@ class Settings {
     private static final String EXTRA_MAXISOINDEX = "com.jonasjuffinger.timelapse.MAXISOINDEX";
     private static final String EXTRA_COOLDOWN = "com.jonasjuffinger.timelapse.COOLDOWN";
     private static final String EXTRA_AVERAGEEXPOSUREAMOUNT = "com.jonasjuffinger.timelapse.AVERAGEEXPOSUREAMOUNT";
+    private static final String EXTRA_DEADBANDINDEX = "com.jonasjuffinger.timelapse.DEADBANDINDEX";
     private static final String EXTRA_HOLYGRAILALLOWEXPOSUREUP = "com.jonasjuffinger.timelapse.HOLYGRAILALLOWEXPOSUREUP";
     private static final String EXTRA_HOLYGRAILALLOWEXPOSUREDOWN = "com.jonasjuffinger.timelapse.HOLYGRAILALLOWEXPOSUREDOWN";
 
@@ -49,6 +50,7 @@ class Settings {
     int maxISOIndex;
     int cooldown;
     int averageExposureAmount;
+    int deadbandIndex;
     boolean holyGrailAllowExposureUp;
     boolean holyGrailAllowExposureDown;
 
@@ -73,11 +75,12 @@ class Settings {
         maxISOIndex = 0;
         cooldown = 5;
         averageExposureAmount = 1;
+        deadbandIndex = 0;
         holyGrailAllowExposureUp = true;
         holyGrailAllowExposureDown = false;
     }
 
-    public Settings(double interval, int shotCount, int delay, boolean displayOff, boolean silentShutter, boolean ael, boolean brs, boolean mf, boolean holyGrail, boolean useCurrentExposure, int targetExposure, int maxShutterSpeed, int maxISO, int cooldown, int averageExposureAmount, boolean holyGrailAllowExposureUp, boolean holyGrailAllowExposureDown) {
+    public Settings(double interval, int shotCount, int delay, boolean displayOff, boolean silentShutter, boolean ael, boolean brs, boolean mf, boolean holyGrail, boolean useCurrentExposure, int targetExposure, int maxShutterSpeed, int maxISO, int cooldown, int averageExposureAmount, int deadbandIndex, boolean holyGrailAllowExposureUp, boolean holyGrailAllowExposureDown) {
         this.interval = interval;
         this.delay = delay;
         this.shotCount = shotCount;
@@ -93,6 +96,7 @@ class Settings {
         this.maxISOIndex = maxISO;
         this.cooldown = cooldown;
         this.averageExposureAmount = averageExposureAmount;
+        this.deadbandIndex = deadbandIndex;
         this.holyGrailAllowExposureUp = holyGrailAllowExposureUp;
         this.holyGrailAllowExposureDown = holyGrailAllowExposureDown;
     }
@@ -113,6 +117,7 @@ class Settings {
         intent.putExtra(EXTRA_MAXISOINDEX, maxISOIndex);
         intent.putExtra(EXTRA_COOLDOWN, cooldown);
         intent.putExtra(EXTRA_AVERAGEEXPOSUREAMOUNT, averageExposureAmount);
+        intent.putExtra(EXTRA_DEADBANDINDEX, deadbandIndex);
         intent.putExtra(EXTRA_HOLYGRAILALLOWEXPOSUREUP, holyGrailAllowExposureUp);
         intent.putExtra(EXTRA_HOLYGRAILALLOWEXPOSUREDOWN, holyGrailAllowExposureDown);
 
@@ -135,6 +140,7 @@ class Settings {
                 intent.getIntExtra(EXTRA_MAXISOINDEX, 0),
                 intent.getIntExtra(EXTRA_COOLDOWN, 5),
                 intent.getIntExtra(EXTRA_AVERAGEEXPOSUREAMOUNT, 1),
+                intent.getIntExtra(EXTRA_DEADBANDINDEX, 0),
                 intent.getBooleanExtra(EXTRA_HOLYGRAILALLOWEXPOSUREUP, true),
                 intent.getBooleanExtra(EXTRA_HOLYGRAILALLOWEXPOSUREDOWN, false)
         );
@@ -160,6 +166,7 @@ class Settings {
         editor.putInt("maxIsoIndex", maxISOIndex);
         editor.putInt("cooldown", cooldown);
         editor.putInt("averageExposureAmount", averageExposureAmount);
+        editor.putInt("deadbandIndex", deadbandIndex);
         editor.putBoolean("holyGrailAllowExposureUp", holyGrailAllowExposureUp);
         editor.putBoolean("holyGrailAllowExposureDown", holyGrailAllowExposureDown);
         editor.apply();
@@ -184,6 +191,7 @@ class Settings {
         maxISOIndex = sharedPref.getInt("maxIsoIndex", maxISOIndex);
         cooldown = sharedPref.getInt("cooldown", cooldown);
         averageExposureAmount = sharedPref.getInt("averageExposureAmount", averageExposureAmount);
+        deadbandIndex = sharedPref.getInt("deadbandIndex", deadbandIndex);
         holyGrailAllowExposureUp = sharedPref.getBoolean("holyGrailAllowExposureUp", holyGrailAllowExposureUp);
         holyGrailAllowExposureDown = sharedPref.getBoolean("holyGrailAllowExposureDown", holyGrailAllowExposureDown);
     }

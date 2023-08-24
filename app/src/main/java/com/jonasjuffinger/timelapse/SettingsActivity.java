@@ -1,5 +1,6 @@
 package com.jonasjuffinger.timelapse;
 
+import static com.jonasjuffinger.timelapse.Util.DEADBAND_VALUES;
 import static com.jonasjuffinger.timelapse.Util.ISO_VALUES;
 import static com.jonasjuffinger.timelapse.Util.SHUTTER_SPEEDS;
 import static com.jonasjuffinger.timelapse.Util.formatShutterSpeed;
@@ -69,6 +70,8 @@ public class SettingsActivity extends BaseActivity
     private TextView tvCooldownValue, tvCooldownUnit;
     private AdvancedSeekBar sbAverageAmount;
     private TextView tvAverageAmountValue, tvAverageAmountUnit;
+    private AdvancedSeekBar sbDeadbandIndex;
+    private TextView tvDeadbandIndexValue, tvDeadbandIndexUnit;
 
     private int fps;
     private Spinner spnFps;
@@ -180,6 +183,15 @@ public class SettingsActivity extends BaseActivity
         sbAverageAmount.setProgress(settings.averageExposureAmount);
         sbAverageAmountOnSeekBarChangeListener.onProgressChanged(sbAverageAmount, settings.averageExposureAmount, false);
 
+        sbDeadbandIndex = (AdvancedSeekBar) findViewById(R.id.sbDeadbandIndex);
+        tvDeadbandIndexValue = (TextView) findViewById(R.id.tvDeadbandIndexValue);
+        tvDeadbandIndexUnit = (TextView) findViewById(R.id.tvDeadbandIndexUnit);
+        sbDeadbandIndex.setMax(DEADBAND_VALUES.length - 1);
+        sbDeadbandIndex.setOnSeekBarChangeListener(sbDeadbandIndexOnSeekBarChangeListener);
+        sbDeadbandIndex.setProgress(settings.deadbandIndex);
+        sbDeadbandIndexOnSeekBarChangeListener.onProgressChanged(sbDeadbandIndex, settings.deadbandIndex, false);
+
+
         //End Holy Grail
 
 
@@ -289,8 +301,9 @@ public class SettingsActivity extends BaseActivity
     sbCooldownOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            settings.cooldown = i;
-            tvCooldownValue.setText(Integer.toString(i));
+            //should always be > 0
+            settings.cooldown = i + 1;
+            tvCooldownValue.setText(Integer.toString(i + 1));
             tvCooldownUnit.setText("pics");
         }
 
@@ -303,8 +316,8 @@ public class SettingsActivity extends BaseActivity
     sbAverageAmountOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            settings.averageExposureAmount = i;
-            tvAverageAmountValue.setText(Integer.toString(i));
+            settings.averageExposureAmount = i + 1;
+            tvAverageAmountValue.setText(Integer.toString(i + 1));
             tvAverageAmountUnit.setText("pics");
         }
 
@@ -314,6 +327,21 @@ public class SettingsActivity extends BaseActivity
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {}
     },
+    sbDeadbandIndexOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            settings.deadbandIndex = i;
+            tvDeadbandIndexValue.setText(String.format("%.2f",DEADBAND_VALUES[i]));
+            tvDeadbandIndexUnit.setText("EV");
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {}
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {}
+    }
+    ,
     sbTargetExposureOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -607,6 +635,7 @@ public class SettingsActivity extends BaseActivity
         sbMaxISO.dialChanged(value);
         sbCooldown.dialChanged(value);
         sbAverageAmount.dialChanged(value);
+        sbDeadbandIndex.dialChanged(value);
         return true;
     }
 
@@ -619,6 +648,7 @@ public class SettingsActivity extends BaseActivity
         sbMaxISO.dialChanged(value);
         sbCooldown.dialChanged(value);
         sbAverageAmount.dialChanged(value);
+        sbDeadbandIndex.dialChanged(value);
         return true;
     }
 
@@ -631,6 +661,7 @@ public class SettingsActivity extends BaseActivity
         sbMaxISO.dialChanged(value);
         sbCooldown.dialChanged(value);
         sbAverageAmount.dialChanged(value);
+        sbDeadbandIndex.dialChanged(value);
         return true;
     }
 
@@ -643,6 +674,7 @@ public class SettingsActivity extends BaseActivity
         sbMaxISO.dialChanged(value);
         sbCooldown.dialChanged(value);
         sbAverageAmount.dialChanged(value);
+        sbDeadbandIndex.dialChanged(value);
         return true;
     }
 

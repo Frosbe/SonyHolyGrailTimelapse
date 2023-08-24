@@ -1,5 +1,6 @@
 package com.jonasjuffinger.timelapse;
 
+import static com.jonasjuffinger.timelapse.Util.DEADBAND_VALUES;
 import static com.jonasjuffinger.timelapse.Util.ISO_VALUES;
 import static com.jonasjuffinger.timelapse.Util.SHUTTER_SPEEDS;
 import static com.jonasjuffinger.timelapse.Util.formatShutterSpeed;
@@ -53,6 +54,7 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
     private TextView tvMaxISO;
     private TextView tvShotsSinceLastChange;
     private TextView tvCooldown;
+    private TextView tvDeadband;
     //End Holy Grail
 
     private List<Float> exposureLevelList = new ArrayList<Float>();
@@ -182,6 +184,7 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
         tvMaxISO = (TextView) findViewById(R.id.tvMaxISO);
         tvShotsSinceLastChange = (TextView) findViewById(R.id.tvShotsSinceLastChange);
         tvCooldown = (TextView) findViewById(R.id.tvCooldown);
+        tvDeadband = (TextView) findViewById(R.id.tvDeadband);
         //end Holy Grail
 
         if (settings.useCurrentExposure){
@@ -189,6 +192,8 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
         } else {
             targetExposureLevel = settings.targetExposure;
         }
+
+        tvDeadband.setText(DEADBAND_VALUES[settings.deadbandIndex] + " EV");
 
         if (settings.holyGrailAllowExposureUp && !settings.holyGrailAllowExposureDown){
             ISOLevelIndex = 0;
@@ -522,7 +527,7 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
     private void holyGrailPrePhotoEvent(){
         float usableExposureLevel = getAverageExposure(settings.averageExposureAmount);
         int cooldown = settings.cooldown;
-        float deadbandSize = 0.5f;
+        float deadbandSize = DEADBAND_VALUES[settings.deadbandIndex];
 
 
         if (settings.holyGrail){

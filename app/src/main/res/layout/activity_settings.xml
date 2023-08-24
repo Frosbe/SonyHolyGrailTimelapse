@@ -362,7 +362,7 @@
                         android:layout_marginLeft="10dp"
                         android:gravity="center_vertical"
                         android:text="Max SS"
-                        android:textSize="20sp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:id="@+id/tvMaxShutterSpeedUnit"
@@ -410,7 +410,7 @@
                         android:layout_marginLeft="10dp"
                         android:gravity="center_vertical"
                         android:text="Max ISO"
-                        android:textSize="20sp" />
+                        android:textSize="16sp" />
 
                     <view
                         android:id="@+id/sbMaxISO"
@@ -431,7 +431,7 @@
                         android:layout_marginRight="5dp"
                         android:layout_toLeftOf="@+id/tvMaxISOUnit"
                         android:gravity="right|center_vertical"
-                        android:text="102400"
+                        android:text="3200"
                         android:textSize="16sp" />
 
                     <TextView
@@ -459,7 +459,7 @@
                         android:layout_marginLeft="10dp"
                         android:gravity="center_vertical"
                         android:text="Cooldwn"
-                        android:textSize="20sp" />
+                        android:textSize="16sp" />
 
                     <view
                         android:id="@+id/sbCooldown"
@@ -508,7 +508,7 @@
                         android:layout_marginLeft="10dp"
                         android:gravity="center_vertical"
                         android:text="Avg Exp"
-                        android:textSize="20sp" />
+                        android:textSize="16sp" />
 
                     <view
                         android:id="@+id/sbAverageAmount"
@@ -540,6 +540,55 @@
                         android:layout_alignParentRight="true"
                         android:gravity="center_vertical"
                         android:text="pics"
+                        android:textSize="20sp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/lblDeadbandIndex"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="center_vertical"
+                        android:text="Deadband"
+                        android:textSize="16sp" />
+
+                    <view
+                        android:id="@+id/sbDeadbandIndex"
+                        class="com.jonasjuffinger.timelapse.AdvancedSeekBar"
+                        android:layout_width="240dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginRight="10dp"
+                        android:layout_toLeftOf="@+id/tvDeadbandIndexValue"
+                        android:layout_toRightOf="@+id/lblDeadbandIndex"
+                        android:gravity="center_vertical" />
+
+                    <TextView
+                        android:id="@+id/tvDeadbandIndexValue"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginRight="5dp"
+                        android:layout_toLeftOf="@+id/tvDeadbandIndexUnit"
+                        android:gravity="right|center_vertical"
+                        android:text="0.0"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/tvDeadbandIndexUnit"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:gravity="center_vertical"
+                        android:text=""
                         android:textSize="20sp" />
 
                 </RelativeLayout>
