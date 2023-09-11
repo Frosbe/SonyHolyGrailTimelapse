@@ -5,11 +5,11 @@ android {
     buildToolsVersion "20.0.0"
 
     defaultConfig {
-        applicationId "com.jonasjuffinger.timelapse"
+        applicationId "com.frosbe.timelapse"
         minSdkVersion 10
         targetSdkVersion 10
         versionCode 7
-        versionName "1.4.1"
+        versionName "1.0.0"
     }
     buildTypes {
         release {
@@ -30,7 +30,7 @@ android {
 
 android.applicationVariants.all { variant ->
     variant.outputs.all { output ->
-        outputFileName =  "TimeLapse-${output.baseName}-${variant.versionName}.apk"
+        outputFileName =  "HolyGrail-${output.baseName}-${variant.versionName}.apk"
     }
 }
 

@@ -1,41 +1,88 @@
-# TimeLapse
-A time lapse app for Sony Alpha cameras using the [OpenMemories: Framework](https://github.com/ma1co/OpenMemories-Framework).
+# Holy Grail
+This app is a fork of [SonyTimeLapse from frosbe](https://github.com/frosbe/TimeLapse).
 
-I have only a a6300 to test it, if you have another camera I would be happy to receive bug reports.
+I have added a few features to allow automatic Holy Grail timelapses ([more about Holy Grail here](https://www.youtube.com/watch?v=XnZwrj88Z0o)).
+
+I have tested it on a A7RII, and the original code was tested by Jonas on a a6300. If you find issues feel free to reach out.
 
 ## Installation ##
 Use [Sony-PMCA-RE](https://github.com/ma1co/Sony-PMCA-RE) or install through [sony-pmca.appspot.com](https://sony-pmca.appspot.com/apps).
 
-Thanks to [ma1co](https://github.com/ma1co) for creating this amazing framework and [obs1dium](https://github.com/obs1dium), I used FocusBracket as a code base.
+With an apk file from [here](https://github.com/Frosbe/SonyHolyGrailTimelapse/releases)
 
 ## Usage ##
-The app is easy to use. It doesn't have any controls for shutter speed, aperture, ISO, picture quality etc. Adjust all this settings before starting the app, it will use them. If you don't want the camera to focus before each shot, set the camera to manual mode.
+If Holy grail is not enabled in the setting of the app it will act exactly like Jonas' original TimeLapse app.
 
-Then start the app set the shoot interval and the amount of pictures it should take. Below the seek bars you can see how long it will take to shoot all the photos and how long the video will be. The fps setting only changes the calculation of the video length, the app doesn't produce a video.
+Once the Holy Grail setting is enabled a few new options will appear.
 
-Finally click the start button and wait.
+# Settings #
 
-You can stop by clicking the MENU button on the camera.
+## Use current exposure ##
+### I suggest enabling this most of the time #
+The target exposure of the timelapse will be the exposure level that the camera observes when taking the first shot.
 
-## SS (Silent Shutter) ##
-The silent shutter option is functionless on cameras without silent shutter mode.
+This is useful for setting the settings on the camera before starting similar to any manual photo.
 
-## MF (Manual Focus) ##
-This sets focus mode to manual. Be sure to have focused before starting the app!
 
-## AEL (Auto Exposure Lock) ##
-This locks the exposure to the exposure of the first shot.
+## Max SS (ShutterSpeed) ##
+### I suggest no more than half of your interval ###
+This set the max shutter speed the timelapse is allowed to use, after this SS has been hit, it will start increasing the ISO
 
-## BRC3 ##
-The app supports exposure bracketing. Set the mode to three-image exposure bracketing outside of the app and check BRC3 checkbox in the app. The app will always take three pictures. Keep in mind that the interval time must be large enough to take all three pictures.
+## Max ISO ##
+Similarly to max SS this is in turn the max ISO the camera is allowed to use, the photos will start getting darker if this is reached.
 
-## DOFF (Display Off) ##
-Turn the display off between each shot. This doesn't change the battery consumption but it can be healthy for the display when taking very long time lapses.
+## Cooldown ##
+### I usually use 5 ###
+How many shots do you want between any settings changes?
 
-## Burst mode ##
-When selecting the lowest interval the camera is in burst mode. In this mode it takes pictures as fast as it can write to the SD card for the duration set by the second slider.
+A value of 5 means that when a setting has been changed the camera will take 5 shots before again evaluating if any changes should be made.
 
-## Known Issues ##
+## Avg Exp ##
+### I use 3 ###
+How many photos should be used to calculate the "current" exposue level?
+
+A setting of 3 will be more smooth transition
+
+A value of 1 will decrease the chance of over/under exposure if light changes rapidly (sun comes out from behind building)
+
+## Deadband ##
+### I use 0.2 ###
+How much above or below target should the exposure level be before changing settings
+
+I suggest having some deadband, especially if you allow both exposure up and down, otherwise it might get flickery
+
+## Allow Exposure Up ##
+This will allow the camera to changes settings in the "more light" direction, ie. longer shutter speed and higher ISO
+
+Use this for sundown
+
+## Allow Exposure Down ##
+This will in turn allow the camera to let in less and less light, ie. lower the ISO or using a faster shutter.
+
+Use this for sunrise
+
+Both can be enabled at the same time but i have not fully tested it.
+
+# New shooting screen #
+
+I have created a new screen that will be shown when shooting.
+
+I suggest disabling automatic photo preview in the sony setting if this screen is not showing for you.
+
+On the screen you can see:
+
+- Current exposure
+- Current calculated average exposure
+- Target exposure
+- Last picture Shutter speed
+- Max Shutter speed
+- Last picture ISO
+- Max ISO
+- Number of pictures taken since last settings change
+- Cooldown setting
+
+# Known Issues #
+I currently do not touch the aparture setting, to prevent focus movement.
 
 If the app crashes the camera, please try the following camera settings. They were reported to work with the RX100 M4.
  - The silent shutter needs to be disabled or unchecked in the app, on some cameras

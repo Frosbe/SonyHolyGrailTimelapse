@@ -1,4 +1,4 @@
-package com.jonasjuffinger.timelapse;
+package com.frosbe.holygrail;
 
 import android.os.Handler;
 

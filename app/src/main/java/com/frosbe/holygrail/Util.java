@@ -1,4 +1,4 @@
-package com.jonasjuffinger.timelapse;
+package com.frosbe.holygrail;
 
 public class Util {
     public static String formatShutterSpeed(int n, int d)

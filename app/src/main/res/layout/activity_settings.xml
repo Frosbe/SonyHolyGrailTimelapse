@@ -54,7 +54,7 @@
 
                 <view
                     android:id="@+id/sbInterval"
-                    class="com.jonasjuffinger.timelapse.AdvancedSeekBar"
+                    class="com.frosbe.holygrail.AdvancedSeekBar"
                     android:layout_width="240dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -92,7 +92,7 @@
 
                 <view
                     android:id="@+id/sbShots"
-                    class="com.jonasjuffinger.timelapse.AdvancedSeekBar"
+                    class="com.frosbe.holygrail.AdvancedSeekBar"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="10dp"
@@ -261,7 +261,7 @@
 
                 <view
                     android:id="@+id/sbDelay"
-                    class="com.jonasjuffinger.timelapse.AdvancedSeekBar"
+                    class="com.frosbe.holygrail.AdvancedSeekBar"
                     android:layout_width="240dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -339,7 +339,7 @@
 
                     <view
                         android:id="@+id/sbTargetExposure"
-                        class="com.jonasjuffinger.timelapse.AdvancedSeekBar"
+                        class="com.frosbe.holygrail.AdvancedSeekBar"
                         android:layout_width="240dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
@@ -387,7 +387,7 @@
 
                     <view
                         android:id="@+id/sbMaxShutterSpeed"
-                        class="com.jonasjuffinger.timelapse.AdvancedSeekBar"
+                        class="com.frosbe.holygrail.AdvancedSeekBar"
                         android:layout_width="240dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
@@ -414,7 +414,7 @@
 
                     <view
                         android:id="@+id/sbMaxISO"
-                        class="com.jonasjuffinger.timelapse.AdvancedSeekBar"
+                        class="com.frosbe.holygrail.AdvancedSeekBar"
                         android:layout_width="240dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
@@ -463,7 +463,7 @@
 
                     <view
                         android:id="@+id/sbCooldown"
-                        class="com.jonasjuffinger.timelapse.AdvancedSeekBar"
+                        class="com.frosbe.holygrail.AdvancedSeekBar"
                         android:layout_width="240dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
@@ -512,7 +512,7 @@
 
                     <view
                         android:id="@+id/sbAverageAmount"
-                        class="com.jonasjuffinger.timelapse.AdvancedSeekBar"
+                        class="com.frosbe.holygrail.AdvancedSeekBar"
                         android:layout_width="240dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
@@ -561,7 +561,7 @@
 
                     <view
                         android:id="@+id/sbDeadbandIndex"
-                        class="com.jonasjuffinger.timelapse.AdvancedSeekBar"
+                        class="com.frosbe.holygrail.AdvancedSeekBar"
                         android:layout_width="240dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"

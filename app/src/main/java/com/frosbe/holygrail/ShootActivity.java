@@ -1,10 +1,9 @@
-package com.jonasjuffinger.timelapse;
+package com.frosbe.holygrail;
 
-import static com.jonasjuffinger.timelapse.Util.DEADBAND_VALUES;
-import static com.jonasjuffinger.timelapse.Util.ISO_VALUES;
-import static com.jonasjuffinger.timelapse.Util.SHUTTER_SPEEDS;
-import static com.jonasjuffinger.timelapse.Util.formatShutterSpeed;
-import static com.jonasjuffinger.timelapse.Util.formatShutterSpeedIndex;
+import static com.frosbe.holygrail.Util.DEADBAND_VALUES;
+import static com.frosbe.holygrail.Util.ISO_VALUES;
+import static com.frosbe.holygrail.Util.SHUTTER_SPEEDS;
+import static com.frosbe.holygrail.Util.formatShutterSpeedIndex;
 
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -12,7 +11,6 @@ import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.BatteryManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.util.Pair;
 import android.view.SurfaceHolder;
@@ -28,7 +26,6 @@ import com.jjoe64.graphview.GraphViewSeries;
 import com.jjoe64.graphview.LineGraphView;
 import com.sony.scalar.hardware.CameraEx;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

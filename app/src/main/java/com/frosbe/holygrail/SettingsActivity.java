@@ -1,14 +1,12 @@
-package com.jonasjuffinger.timelapse;
+package com.frosbe.holygrail;
 
-import static com.jonasjuffinger.timelapse.Util.DEADBAND_VALUES;
-import static com.jonasjuffinger.timelapse.Util.ISO_VALUES;
-import static com.jonasjuffinger.timelapse.Util.SHUTTER_SPEEDS;
-import static com.jonasjuffinger.timelapse.Util.formatShutterSpeed;
+import static com.frosbe.holygrail.Util.DEADBAND_VALUES;
+import static com.frosbe.holygrail.Util.ISO_VALUES;
+import static com.frosbe.holygrail.Util.SHUTTER_SPEEDS;
+import static com.frosbe.holygrail.Util.formatShutterSpeed;
 
 import android.content.Intent;
-import android.hardware.Camera;
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -23,11 +21,6 @@ import android.widget.TextView;
 
 import com.github.ma1co.pmcademo.app.BaseActivity;
 import com.sony.scalar.hardware.CameraEx;
-
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class SettingsActivity extends BaseActivity
 {

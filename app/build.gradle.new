@@ -5,7 +5,7 @@ android {
     buildToolsVersion '26.0.2'
 
     defaultConfig {
-        applicationId "com.jonasjuffinger.timelapse"
+        applicationId "com.frosbe.timelapse"
         minSdkVersion 10
         targetSdkVersion 10
         versionCode 4

@@ -1,10 +1,8 @@
-package com.jonasjuffinger.timelapse;
+package com.frosbe.holygrail;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
@@ -13,24 +11,24 @@ import static android.preference.PreferenceManager.getDefaultSharedPreferences;
  */
 
 class Settings {
-    private static final String EXTRA_INTERVAL = "com.jonasjuffinger.timelapse.INTERVAL";
-    private static final String EXTRA_SHOTCOUNT = "com.jonasjuffinger.timelapse.SHOTCOUNT";
-    private static final String EXTRA_DELAY = "com.jonasjuffinger.timelapse.DELAY";
-    private static final String EXTRA_DISPLAYOFF = "com.jonasjuffinger.timelapse.DISPLAYOFF";
-    private static final String EXTRA_SILENTSHUTTER = "com.jonasjuffinger.timelapse.SILENTSHUTTER";
-    private static final String EXTRA_AEL = "com.jonasjuffinger.timelapse.AEL";
-    private static final String EXTRA_BRS = "com.jonasjuffinger.timelapse.BRS";
-    private static final String EXTRA_MF = "com.jonasjuffinger.timelapse.MF";
-    private static final String EXTRA_HOLYGRAIL = "com.jonasjuffinger.timelapse.HOLYGRAIL";
-    private static final String EXTRA_USECURRENTEXPOSURE = "com.jonasjuffinger.timelapse.USECURRENTEXPOSURE";
-    private static final String EXTRA_TARGETEXPOSURE = "com.jonasjuffinger.timelapse.TARGETEXPOSURE";
-    private static final String EXTRA_MAXSHUTTERSPEEDINDEX = "com.jonasjuffinger.timelapse.MAXSHUTTERSPEEDINDEX";
-    private static final String EXTRA_MAXISOINDEX = "com.jonasjuffinger.timelapse.MAXISOINDEX";
-    private static final String EXTRA_COOLDOWN = "com.jonasjuffinger.timelapse.COOLDOWN";
-    private static final String EXTRA_AVERAGEEXPOSUREAMOUNT = "com.jonasjuffinger.timelapse.AVERAGEEXPOSUREAMOUNT";
-    private static final String EXTRA_DEADBANDINDEX = "com.jonasjuffinger.timelapse.DEADBANDINDEX";
-    private static final String EXTRA_HOLYGRAILALLOWEXPOSUREUP = "com.jonasjuffinger.timelapse.HOLYGRAILALLOWEXPOSUREUP";
-    private static final String EXTRA_HOLYGRAILALLOWEXPOSUREDOWN = "com.jonasjuffinger.timelapse.HOLYGRAILALLOWEXPOSUREDOWN";
+    private static final String EXTRA_INTERVAL = "com.frosbe.timelapse.INTERVAL";
+    private static final String EXTRA_SHOTCOUNT = "com.frosbe.timelapse.SHOTCOUNT";
+    private static final String EXTRA_DELAY = "com.frosbe.timelapse.DELAY";
+    private static final String EXTRA_DISPLAYOFF = "com.frosbe.timelapse.DISPLAYOFF";
+    private static final String EXTRA_SILENTSHUTTER = "com.frosbe.timelapse.SILENTSHUTTER";
+    private static final String EXTRA_AEL = "com.frosbe.timelapse.AEL";
+    private static final String EXTRA_BRS = "com.frosbe.timelapse.BRS";
+    private static final String EXTRA_MF = "com.frosbe.timelapse.MF";
+    private static final String EXTRA_HOLYGRAIL = "com.frosbe.timelapse.HOLYGRAIL";
+    private static final String EXTRA_USECURRENTEXPOSURE = "com.frosbe.timelapse.USECURRENTEXPOSURE";
+    private static final String EXTRA_TARGETEXPOSURE = "com.frosbe.timelapse.TARGETEXPOSURE";
+    private static final String EXTRA_MAXSHUTTERSPEEDINDEX = "com.frosbe.timelapse.MAXSHUTTERSPEEDINDEX";
+    private static final String EXTRA_MAXISOINDEX = "com.frosbe.timelapse.MAXISOINDEX";
+    private static final String EXTRA_COOLDOWN = "com.frosbe.timelapse.COOLDOWN";
+    private static final String EXTRA_AVERAGEEXPOSUREAMOUNT = "com.frosbe.timelapse.AVERAGEEXPOSUREAMOUNT";
+    private static final String EXTRA_DEADBANDINDEX = "com.frosbe.timelapse.DEADBANDINDEX";
+    private static final String EXTRA_HOLYGRAILALLOWEXPOSUREUP = "com.frosbe.timelapse.HOLYGRAILALLOWEXPOSUREUP";
+    private static final String EXTRA_HOLYGRAILALLOWEXPOSUREDOWN = "com.frosbe.timelapse.HOLYGRAILALLOWEXPOSUREDOWN";
 
 
     double interval;

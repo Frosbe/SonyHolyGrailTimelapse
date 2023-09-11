@@ -1,4 +1,4 @@
-package com.jonasjuffinger.timelapse;
+package com.frosbe.holygrail;
 // https://github.com/obs1dium/BetterManual/blob/master/app/src/main/java/com/obsidium/bettermanual/SonyDrawables.java
 
 public class SonyDrawables
