@@ -545,6 +545,7 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
                             log("ISO is less than max ISO");
                             //increase ISO
                             incrementISO();
+                            shotsSinceLastChange = 0;
                         } else {
                             log("can't increase shutter speed or ISO");
                         }
@@ -558,6 +559,7 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
                             log("ISOLevelIdex, trying lower iso: " + ISOLevelIndex);
                             //decrease ISO
                             decrementISO();
+                            shotsSinceLastChange = 0;
                         } else if (shutterSpeedIndex > 0){
                             log("shutterSpeedIndex, trying lower shutterspeed: " + shutterSpeedIndex);
                             //make the shutter open shorter
