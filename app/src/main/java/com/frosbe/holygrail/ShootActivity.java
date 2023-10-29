@@ -559,7 +559,7 @@ public class ShootActivity extends BaseActivity implements SurfaceHolder.Callbac
                             //decrease ISO
                             decrementISO();
                         } else if (shutterSpeedIndex > 0){
-                            log("shutterSpeedIndex, trying lower shutterspeed: " + shutterSpeedIndex)
+                            log("shutterSpeedIndex, trying lower shutterspeed: " + shutterSpeedIndex);
                             //make the shutter open shorter
                             cameraEx.incrementShutterSpeed();
                             shotsSinceLastChange = 0;
