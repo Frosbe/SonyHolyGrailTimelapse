@@ -1,5 +1,5 @@
 # Holy Grail
-This app is a fork of [SonyTimeLapse from frosbe](https://github.com/frosbe/TimeLapse).
+This app is a fork of [SonyTimeLapse from jonasjuffinger](https://github.com/jonasjuffinger/TimeLapse).
 
 I have added a few features to allow automatic Holy Grail timelapses ([more about Holy Grail here](https://www.youtube.com/watch?v=XnZwrj88Z0o)).
 
